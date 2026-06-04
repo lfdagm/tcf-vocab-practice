@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pratique du vocabulaire — Français TCF</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, Arial, sans-serif; max-width: 920px; margin: 0 auto; padding: 20px; background: #f5f5f7; color: #222; }
+  h1 { font-size: 22px; text-align: center; }
+  .layout { display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
+  .main { flex:2; min-width:300px; }
+  .side { flex:1; min-width:220px; background:#fff; border-radius:16px; padding:18px; box-shadow:0 2px 12px rgba(0,0,0,.08); }
+  .card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+  .tag { display:inline-block; font-size: 13px; color:#888; background:#eee; padding:3px 10px; border-radius:20px; margin-bottom:14px; }
+  .def { font-size: 21px; line-height:1.4; margin-bottom: 8px; }
+  .es { font-size: 15px; color:#999; font-style:italic; margin-bottom:18px; display:none; }
+  input { width:100%; font-size:22px; padding:12px; border:2px solid #ccc; border-radius:10px; }
+  .row { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  button { flex:1; min-width:110px; font-size:16px; padding:12px; border:none; border-radius:10px; background:#1a73e8; color:#fff; cursor:pointer; }
+  button.sec { background:#888; font-size:15px; padding:10px; }
+  button.verif { width:100%; flex:1 0 100%; font-size:19px; padding:16px; font-weight:bold; background:#1a73e8; box-shadow:0 2px 8px rgba(26,115,232,.35); }
+  .answer.ok2 { color:#1a8a3a; }   /* respuesta correcta en verde */
+  .feedback { margin-top:16px; font-size:18px; font-weight:bold; min-height:26px; }
+  .ok { color:#1a8a3a; }
+  .no { color:#d33; }
+  .answer { margin-top:8px; font-size:20px; color:#1a5; font-weight:bold; }
+  .ex { margin-top:10px; font-style:italic; color:#666; font-size:16px; display:none; }
+  .score { text-align:center; font-size:15px; color:#666; margin-top:18px; }
+  select { font-size:15px; padding:8px; border-radius:8px; margin-top:10px; width:100%; }
+  .rewrite { margin-top:18px; padding:14px; background:#fff7e6; border:1px dashed #e0a800; border-radius:12px; display:none; }
+  .rewrite label { font-size:14px; color:#a07400; display:block; margin-bottom:8px; }
+  .rewrite .done { color:#1a8a3a; font-weight:bold; margin-top:8px; min-height:20px; }
+  .side h3 { font-size:16px; margin:0 0 10px; }
+  .errlist { list-style:none; padding:0; margin:0; max-height:60vh; overflow:auto; }
+  .errlist li { padding:8px 10px; border-bottom:1px solid #eee; font-size:15px; }
+  .errlist .w { font-weight:bold; color:#d33; }
+  .errlist .small { font-size:12px; color:#999; }
+  .clearbtn { background:#bbb; margin-top:10px; }
+  /* Tabs */
+  .tabs { display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+  .tabs button { flex:0 0 auto; min-width:0; background:#e3e3e8; color:#444; padding:10px 20px; font-size:15px; }
+  .tabs button.active { background:#1a73e8; color:#fff; }
+  .hidden { display:none !important; }
+  /* Flashcards */
+  .speak { background:none; border:none; cursor:pointer; font-size:22px; padding:4px 8px; flex:0 0 auto; min-width:0; color:#1a73e8; }
+  .flash { background:#fff; border-radius:16px; padding:30px 24px; box-shadow:0 2px 12px rgba(0,0,0,.08); min-height:260px; display:flex; flex-direction:column; justify-content:center; }
+  .flash .ftag { font-size:13px; color:#888; background:#eee; padding:3px 10px; border-radius:20px; align-self:center; margin-bottom:18px; }
+  .flash .word { font-size:30px; font-weight:bold; text-align:center; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .flash .back { margin-top:18px; border-top:1px solid #eee; padding-top:16px; }
+  .flash .es2 { font-size:17px; color:#1a73e8; font-style:italic; margin-bottom:12px; }
+  .flash .def2 { font-size:18px; line-height:1.45; margin-bottom:12px; }
+  .flash .ex2 { font-size:16px; font-style:italic; color:#666; }
+  .fliphint { text-align:center; font-size:13px; color:#aaa; margin-top:14px; }
+  .fnav { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .fcount { text-align:center; font-size:14px; color:#666; margin-top:14px; }
+  .voicebar { display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:14px; flex-wrap:wrap; }
+  .voicebar label { font-size:13px; color:#888; }
+  .voicebar select { width:auto; min-width:160px; max-width:100%; margin-top:0; }
+  .showes { background:#eef3ff; color:#1a73e8; border:1px solid #cfe0ff; font-size:14px; padding:8px 14px; border-radius:8px; cursor:pointer; flex:0 0 auto; min-width:0; }
+</style>
+</head>
+<body>
+<h1>🇫🇷 Pratique du vocabulaire</h1>
+
+<div class="tabs">
+  <button id="tabFlash" class="active" onclick="showTab('flash')">🃏 Flashcards</button>
+  <button id="tabEcrit" onclick="showTab('ecrit')">✍️ Écriture</button>
+</div>
+
+<select id="theme">
+  <option value="">Tous les thèmes</option>
+</select>
+
+<div id="viewEcrit" class="hidden">
+<div class="layout">
+  <div class="main">
+    <div class="card">
+      <span class="tag" id="tag"></span>
+      <div class="def" id="def">—</div>
+      <div class="es" id="es"></div>
+      <input id="inp" type="text" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Écris le mot en français...">
+      <div class="row">
+        <button class="verif" onclick="check()">Vérifier</button>
+      </div>
+      <div class="row">
+        <button class="sec" onclick="prevQ()">‹ Précédent</button>
+        <button class="sec" onclick="showHint()">Indice (espagnol)</button>
+        <button class="sec" onclick="reveal()">Voir la réponse</button>
+        <button class="sec" onclick="next()">Suivant ›</button>
+      </div>
+      <div class="feedback" id="fb"></div>
+      <div class="answer" id="ans">
+        <span id="ansText"></span>
+        <button class="speak hidden" id="espeak" onclick="speakWord(cur && cur.f)" title="Écouter">🔊</button>
+      </div>
+      <div class="ex" id="ex"></div>
+
+      <div class="rewrite" id="rewrite">
+        <label>✍️ Réécris le mot correct pour le mémoriser :</label>
+        <input id="rwinp" type="text" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Réécris ici...">
+        <div class="done" id="rwdone"></div>
+      </div>
+    </div>
+    <div class="score" id="score">Score : 0 / 0</div>
+  </div>
+
+  <div class="side">
+    <h3>❌ Mots à revoir (<span id="errcount">0</span>)</h3>
+    <ul class="errlist" id="errlist"></ul>
+    <button class="clearbtn" onclick="clearErrors()">Vider la liste</button>
+  </div>
+</div>
+</div>
+
+<div id="viewFlash">
+  <div class="main">
+    <div class="voicebar">
+      <label for="voiceSel">🗟️ Voix :</label>
+      <select id="voiceSel" onchange="onVoiceChange()"></select>
+      <button class="showes" id="randomBtn" onclick="toggleRandom()">🔀 Aléatoire : OFF</button>
+    </div>
+    <div class="flash" id="flash">
+      <span class="ftag" id="ftag"></span>
+      <div class="word">
+        <span id="fword">—</span>
+        <button class="speak" id="fspeak" onclick="speak();" title="Écouter">🔊</button>
+      </div>
+      <div class="back">
+        <div class="def2" id="fdef"></div>
+        <div class="ex2" id="fex"></div>
+        <button class="showes" id="showesBtn" onclick="toggleEs();">🇪🇸 Voir la traduction</button>
+        <div class="es2 hidden" id="fes"></div>
+      </div>
+    </div>
+    <div class="fnav">
+      <button class="sec" onclick="fprev()">‹ Précédent</button>
+      <button onclick="fnext()">Suivant ›</button>
+    </div>
+    <div class="fcount" id="fcount"></div>
+    <div class="fcount" style="font-size:12px; color:#aaa; margin-top:6px;">
+      ⌨️ Espace / → : suivante · Suppr / ← : précédente · P / ↑ : écouter · T : traduction
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = [{"f": "candidature", "es": "solicitud de empleo", "d": "Demande écrite pour obtenir un poste ou un emploi.", "ex": "J'ai envoyé ma candidature pour le poste de comptable.", "t": "Travail"}, {"f": "embauche", "es": "contratación", "d": "Action de recruter et d'engager un nouveau salarié.", "ex": "L'embauche de nouveaux employés est prévue pour septembre.", "t": "Travail"}, {"f": "entretien d'embauche", "es": "entrevista de trabajo", "d": "Rencontre entre un employeur et un candidat pour évaluer ses compétences.", "ex": "J'ai un entretien d'embauche demain matin.", "t": "Travail"}, {"f": "offre d'emploi", "es": "oferta de trabajo", "d": "Annonce par laquelle une entreprise propose un poste à pourvoir.", "ex": "J'ai trouvé une offre d'emploi intéressante sur LinkedIn.", "t": "Travail"}, {"f": "lettre de motivation", "es": "carta de presentación", "d": "Texte qui accompagne un CV pour expliquer pourquoi on postule.", "ex": "Ma lettre de motivation explique pourquoi je suis le bon candidat.", "t": "Travail"}, {"f": "curriculum vitae", "es": "currículum vitae", "d": "Document qui résume le parcours professionnel et la formation d'une personne.", "ex": "Veuillez joindre votre curriculum vitae à votre candidature.", "t": "Travail"}, {"f": "réunion", "es": "reunión", "d": "Rencontre de plusieurs personnes pour discuter ou décider ensemble.", "ex": "La réunion d'équipe a lieu tous les lundis matins.", "t": "Travail"}, {"f": "collègue", "es": "colega", "d": "Personne avec qui l'on travaille dans la même entreprise.", "ex": "Mes collègues sont très accueillants.", "t": "Travail"}, {"f": "hiérarchie", "es": "jerarquía", "d": "Organisation des niveaux d'autorité dans une entreprise.", "ex": "Dans cette entreprise, la hiérarchie est très stricte.", "t": "Travail"}, {"f": "promotion", "es": "ascenso", "d": "Passage à un poste plus élevé ou mieux payé.", "ex": "Elle a obtenu une promotion après cinq ans de travail.", "t": "Travail"}, {"f": "télétravail", "es": "teletrabajo", "d": "Travail effectué à distance, souvent depuis le domicile.", "ex": "Le télétravail est devenu courant depuis la pandémie.", "t": "Travail"}, {"f": "congé", "es": "permiso / vacaciones", "d": "Période pendant laquelle un salarié est autorisé à ne pas travailler.", "ex": "Je prends deux semaines de congé en juillet.", "t": "Travail"}, {"f": "démission", "es": "renuncia", "d": "Acte par lequel un salarié quitte volontairement son emploi.", "ex": "Il a annoncé sa démission la semaine dernière.", "t": "Travail"}, {"f": "salaire", "es": "salario", "d": "Somme d'argent versée régulièrement en échange d'un travail.", "ex": "Mon salaire est versé le dernier jour du mois.", "t": "Travail"}, {"f": "prime", "es": "bonificación", "d": "Somme d'argent versée en plus du salaire habituel.", "ex": "J'ai reçu une prime de fin d'année.", "t": "Travail"}, {"f": "contrat", "es": "contrato", "d": "Accord officiel qui définit les conditions de travail.", "ex": "J'ai signé un contrat à durée indéterminée.", "t": "Travail"}, {"f": "horaires", "es": "horarios", "d": "Répartition des heures de travail dans la journée.", "ex": "Les horaires de bureau sont flexibles.", "t": "Travail"}, {"f": "temps partiel", "es": "medio tiempo", "d": "Travail effectué pendant une partie seulement de la durée normale.", "ex": "Elle travaille à temps partiel pour s'occuper de ses enfants.", "t": "Travail"}, {"f": "temps plein", "es": "tiempo completo", "d": "Travail effectué pendant la durée complète prévue par la loi.", "ex": "Je cherche un emploi à temps plein.", "t": "Travail"}, {"f": "formation", "es": "formación", "d": "Ensemble de cours pour acquérir des connaissances ou des compétences.", "ex": "L'entreprise offre une formation continue à ses employés.", "t": "Travail"}, {"f": "stage", "es": "pasantía", "d": "Période de formation pratique en entreprise.", "ex": "J'ai fait un stage de trois mois dans une startup.", "t": "Travail"}, {"f": "expérience", "es": "experiencia", "d": "Ensemble des connaissances acquises par la pratique d'un métier.", "ex": "Cinq ans d'expérience sont requis pour ce poste.", "t": "Travail"}, {"f": "qualification", "es": "cualificación", "d": "Compétence ou diplôme qui rend apte à exercer un travail.", "ex": "Vos qualifications correspondent au profil recherché.", "t": "Travail"}, {"f": "polyvalent", "es": "polivalente", "d": "Qui est capable de faire plusieurs tâches différentes.", "ex": "Nous cherchons un candidat polyvalent et autonome.", "t": "Travail"}, {"f": "spécialisé", "es": "especializado", "d": "Qui possède des connaissances approfondies dans un domaine précis.", "ex": "Il est spécialisé dans la cybersécurité.", "t": "Travail"}, {"f": "poser sa candidature", "es": "postularse", "d": "Présenter sa demande pour obtenir un poste.", "ex": "J'ai posé ma candidature pour trois entreprises.", "t": "Travail"}, {"f": "décrocher un emploi", "es": "conseguir un empleo", "d": "Réussir à obtenir un travail.", "ex": "Elle a décroché un emploi dans une banque.", "t": "Travail"}, {"f": "gravir les échelons", "es": "subir de rango", "d": "Progresser peu à peu vers des postes plus élevés.", "ex": "Il a gravi les échelons rapidement dans cette société.", "t": "Travail"}, {"f": "faire ses preuves", "es": "demostrar su valía", "d": "Montrer sa valeur et ses compétences par ses actes.", "ex": "Les nouveaux employés doivent faire leurs preuves.", "t": "Travail"}, {"f": "être en période d'essai", "es": "estar en periodo de prueba", "d": "Phase initiale d'un emploi pendant laquelle on évalue le salarié.", "ex": "Je suis encore en période d'essai pour deux mois.", "t": "Travail"}, {"f": "école", "es": "escuela", "d": "Établissement où les enfants reçoivent leur premier enseignement.", "ex": "Mes enfants vont à l'école primaire du quartier.", "t": "Education"}, {"f": "collège", "es": "secundaria", "d": "Établissement scolaire qui suit l'école primaire.", "ex": "Mon fils entre au collège l'année prochaine.", "t": "Education"}, {"f": "lycée", "es": "preparatoria / liceo", "d": "Établissement où l'on prépare le baccalauréat après le collège.", "ex": "Au lycée, on prépare le baccalauréat.", "t": "Education"}, {"f": "université", "es": "universidad", "d": "Établissement d'enseignement supérieur après le lycée.", "ex": "Elle étudie à l'université de Montréal.", "t": "Education"}, {"f": "faculté", "es": "facultad", "d": "Partie d'une université consacrée à une discipline.", "ex": "Il est inscrit à la faculté de médecine.", "t": "Education"}, {"f": "cursus", "es": "plan de estudios", "d": "Ensemble des études suivies dans un parcours scolaire.", "ex": "Mon cursus comprend des cours obligatoires et optionnels.", "t": "Education"}, {"f": "diplôme", "es": "diploma", "d": "Document officiel qui atteste la réussite d'études.", "ex": "Elle a obtenu son diplôme avec mention.", "t": "Education"}, {"f": "cours", "es": "curso / clase", "d": "Séance d'enseignement sur un sujet donné.", "ex": "Le cours de français commence à neuf heures.", "t": "Education"}, {"f": "examen", "es": "examen", "d": "Épreuve qui permet d'évaluer les connaissances d'une personne.", "ex": "J'ai un examen important la semaine prochaine.", "t": "Education"}, {"f": "évaluation", "es": "evaluación", "d": "Mesure du niveau ou de la valeur d'un travail.", "ex": "L'évaluation finale comptera pour 50% de la note.", "t": "Education"}, {"f": "note", "es": "nota / calificación", "d": "Appréciation chiffrée d'un travail scolaire.", "ex": "J'ai eu une bonne note à mon dernier devoir.", "t": "Education"}, {"f": "réussite", "es": "éxito / aprobación", "d": "Fait d'atteindre un résultat positif ou de réussir un examen.", "ex": "La réussite à cet examen ouvre beaucoup de portes.", "t": "Education"}, {"f": "échec", "es": "fracaso / reprobación", "d": "Fait de ne pas réussir ou de ne pas atteindre son but.", "ex": "L'échec scolaire est un problème important.", "t": "Education"}, {"f": "rattrapage", "es": "recuperación (examen)", "d": "Nouvelle épreuve offerte à ceux qui ont échoué.", "ex": "J'ai dû passer le rattrapage en juin.", "t": "Education"}, {"f": "master", "es": "maestría", "d": "Diplôme universitaire qui suit la licence.", "ex": "Je termine mon master en gestion cette année.", "t": "Education"}, {"f": "doctorat", "es": "doctorado", "d": "Plus haut diplôme universitaire, obtenu après une thèse.", "ex": "Elle prépare un doctorat en biologie.", "t": "Education"}, {"f": "mémoire", "es": "tesina", "d": "Travail écrit présenté à la fin de certaines études.", "ex": "Je rédige mon mémoire sur l'intelligence artificielle.", "t": "Education"}, {"f": "thèse", "es": "tesis", "d": "Long travail de recherche présenté pour obtenir un doctorat.", "ex": "Sa thèse porte sur le changement climatique.", "t": "Education"}, {"f": "bourse d'études", "es": "beca", "d": "Aide financière accordée à un étudiant pour ses études.", "ex": "J'ai obtenu une bourse d'études pour étudier au Canada.", "t": "Education"}, {"f": "campus", "es": "campus", "d": "Ensemble des terrains et bâtiments d'une université.", "ex": "Le campus universitaire est immense.", "t": "Education"}, {"f": "recyclage (formation)", "es": "reciclaje (formación)", "d": "Formation destinée à mettre à jour ses compétences.", "ex": "Les employés suivent un recyclage tous les deux ans.", "t": "Education"}, {"f": "perfectionnement", "es": "perfeccionamiento", "d": "Action d'améliorer encore ses connaissances ou compétences.", "ex": "Je suis des cours de perfectionnement en anglais.", "t": "Education"}, {"f": "certification", "es": "certificación", "d": "Document officiel qui garantit un niveau ou une compétence.", "ex": "Cette certification est reconnue internationalement.", "t": "Education"}, {"f": "apprentissage en ligne", "es": "aprendizaje en línea", "d": "Formation suivie à distance grâce à internet.", "ex": "L'apprentissage en ligne permet plus de flexibilité.", "t": "Education"}, {"f": "passer un examen", "es": "presentar un examen", "d": "Se présenter à une épreuve d'évaluation.", "ex": "Je vais passer le TCF Canada en juillet.", "t": "Education"}, {"f": "obtenir un diplôme", "es": "obtener un diploma", "d": "Réussir ses études et recevoir le document officiel.", "ex": "Il a obtenu son diplôme d'ingénieur en 2024.", "t": "Education"}, {"f": "suivre une formation", "es": "cursar una formación", "d": "Participer à un ensemble de cours pour apprendre.", "ex": "Je suis une formation en comptabilité.", "t": "Education"}, {"f": "décrocher une bourse", "es": "conseguir una beca", "d": "Réussir à obtenir une aide financière pour étudier.", "ex": "Elle a décroché une bourse prestigieuse.", "t": "Education"}, {"f": "poursuivre ses études", "es": "continuar los estudios", "d": "Continuer à étudier vers un niveau plus élevé.", "ex": "Il veut poursuivre ses études à l'étranger.", "t": "Education"}, {"f": "médecin", "es": "médico", "d": "Personne qui soigne les malades et exerce la médecine.", "ex": "Mon médecin de famille est très attentif.", "t": "Sante"}, {"f": "ordonnance", "es": "receta médica", "d": "Document écrit par un médecin pour prescrire des médicaments.", "ex": "Le pharmacien a refusé sans ordonnance.", "t": "Sante"}, {"f": "traitement", "es": "tratamiento", "d": "Ensemble de soins pour guérir une maladie.", "ex": "Le traitement dure environ trois semaines.", "t": "Sante"}, {"f": "diagnostic", "es": "diagnóstico", "d": "Identification d'une maladie d'après ses symptômes.", "ex": "Le diagnostic a été confirmé par un spécialiste.", "t": "Sante"}, {"f": "symptôme", "es": "síntoma", "d": "Signe qui révèle la présence d'une maladie.", "ex": "Les symptômes ont disparu après deux jours.", "t": "Sante"}, {"f": "consultation", "es": "consulta", "d": "Rendez-vous avec un médecin pour un examen ou un avis.", "ex": "La consultation coûte 50 dollars.", "t": "Sante"}, {"f": "hôpital", "es": "hospital", "d": "Établissement où l'on soigne et hospitalise les malades.", "ex": "Il a été transporté à l'hôpital en ambulance.", "t": "Sante"}, {"f": "clinique", "es": "clínica", "d": "Établissement de soins, souvent privé.", "ex": "J'ai rendez-vous à la clinique demain.", "t": "Sante"}, {"f": "urgences", "es": "urgencias", "d": "Service hospitalier qui traite les cas graves et immédiats.", "ex": "Nous avons attendu trois heures aux urgences.", "t": "Sante"}, {"f": "assurance maladie", "es": "seguro médico", "d": "Système qui rembourse les frais de santé.", "ex": "L'assurance maladie couvre la plupart des frais.", "t": "Sante"}, {"f": "sécurité sociale", "es": "seguridad social", "d": "Système public qui protège les citoyens en cas de maladie ou de besoin.", "ex": "La sécurité sociale est universelle au Canada.", "t": "Sante"}, {"f": "alimentation", "es": "alimentación", "d": "Manière de se nourrir et ensemble des aliments consommés.", "ex": "Une bonne alimentation est essentielle.", "t": "Sante"}, {"f": "exercice physique", "es": "ejercicio físico", "d": "Activité du corps pratiquée pour rester en forme.", "ex": "Je fais de l'exercice physique trois fois par semaine.", "t": "Sante"}, {"f": "sommeil", "es": "sueño", "d": "État de repos pendant lequel on dort.", "ex": "Le manque de sommeil affecte la concentration.", "t": "Sante"}, {"f": "stress", "es": "estrés", "d": "État de tension nerveuse causé par la pression.", "ex": "Le stress au travail peut nuire à la santé.", "t": "Sante"}, {"f": "prévention", "es": "prevención", "d": "Ensemble de mesures pour éviter une maladie ou un risque.", "ex": "La prévention vaut mieux que la guérison.", "t": "Sante"}, {"f": "hygiène de vie", "es": "hábitos saludables", "d": "Habitudes quotidiennes qui favorisent une bonne santé.", "ex": "Une bonne hygiène de vie prévient beaucoup de maladies.", "t": "Sante"}, {"f": "grippe", "es": "gripe", "d": "Maladie contagieuse causant fièvre et fatigue.", "ex": "J'ai attrapé la grippe la semaine dernière.", "t": "Sante"}, {"f": "allergie", "es": "alergia", "d": "Réaction excessive du corps à une substance particulière.", "ex": "J'ai une allergie aux arachides.", "t": "Sante"}, {"f": "infection", "es": "infección", "d": "Invasion du corps par des microbes provoquant une maladie.", "ex": "Le médecin a diagnostiqué une infection.", "t": "Sante"}, {"f": "douleur", "es": "dolor", "d": "Sensation pénible ressentie dans une partie du corps.", "ex": "Je ressens une douleur au dos depuis hier.", "t": "Sante"}, {"f": "fièvre", "es": "fiebre", "d": "Élévation anormale de la température du corps.", "ex": "Mon fils a de la fièvre depuis ce matin.", "t": "Sante"}, {"f": "fatigue chronique", "es": "fatiga crónica", "d": "Épuisement persistant qui dure dans le temps.", "ex": "La fatigue chronique peut indiquer un problème de santé.", "t": "Sante"}, {"f": "prendre rendez-vous", "es": "pedir cita", "d": "Fixer une date pour rencontrer un professionnel.", "ex": "Je dois prendre rendez-vous chez le dentiste.", "t": "Sante"}, {"f": "avoir mal à", "es": "tener dolor en", "d": "Ressentir une douleur à un endroit du corps.", "ex": "J'ai mal à la tête depuis ce matin.", "t": "Sante"}, {"f": "être en bonne santé", "es": "estar sano/a", "d": "Ne pas être malade, se porter bien.", "ex": "Heureusement, je suis en bonne santé.", "t": "Sante"}, {"f": "suivre un traitement", "es": "seguir un tratamiento", "d": "Respecter les soins prescrits par un médecin.", "ex": "Elle suit un traitement contre l'hypertension.", "t": "Sante"}, {"f": "faire un bilan de santé", "es": "hacerse un chequeo", "d": "Faire des examens pour vérifier son état général.", "ex": "Je fais un bilan de santé chaque année.", "t": "Sante"}, {"f": "réchauffement climatique", "es": "calentamiento global", "d": "Hausse des températures de la planète causée par l'activité humaine.", "ex": "Le réchauffement climatique menace les glaciers.", "t": "Environnement"}, {"f": "pollution", "es": "contaminación", "d": "Dégradation de l'environnement par des substances nocives.", "ex": "La pollution de l'air est un problème majeur en ville.", "t": "Environnement"}, {"f": "biodiversité", "es": "biodiversidad", "d": "Variété des espèces vivantes dans un milieu naturel.", "ex": "La déforestation menace la biodiversité.", "t": "Environnement"}, {"f": "déforestation", "es": "deforestación", "d": "Destruction des forêts par l'homme.", "ex": "La déforestation en Amazonie inquiète les scientifiques.", "t": "Environnement"}, {"f": "gaz à effet de serre", "es": "gases de efecto invernadero", "d": "Gaz qui retiennent la chaleur et réchauffent l'atmosphère.", "ex": "Il faut réduire les émissions de gaz à effet de serre.", "t": "Environnement"}, {"f": "développement durable", "es": "desarrollo sostenible", "d": "Développement qui respecte l'environnement et les générations futures.", "ex": "Le développement durable est l'avenir de notre économie.", "t": "Environnement"}, {"f": "énergie renouvelable", "es": "energía renovable", "d": "Énergie issue de sources naturelles inépuisables.", "ex": "Les énergies renouvelables se développent rapidement.", "t": "Environnement"}, {"f": "recyclage", "es": "reciclaje", "d": "Transformation des déchets pour les réutiliser.", "ex": "Le recyclage du plastique reste insuffisant.", "t": "Environnement"}, {"f": "tri des déchets", "es": "separación de residuos", "d": "Séparation des déchets selon leur type pour les recycler.", "ex": "Le tri des déchets est obligatoire dans notre quartier.", "t": "Environnement"}, {"f": "empreinte carbone", "es": "huella de carbono", "d": "Quantité de gaz à effet de serre produite par une activité.", "ex": "Voyager en avion augmente notre empreinte carbone.", "t": "Environnement"}, {"f": "sensibiliser", "es": "sensibilizar", "d": "Rendre quelqu'un attentif et conscient d'un problème.", "ex": "Il faut sensibiliser les jeunes à l'écologie.", "t": "Environnement"}, {"f": "préserver", "es": "preservar", "d": "Protéger quelque chose pour le garder intact.", "ex": "Nous devons préserver les forêts pour les générations futures.", "t": "Environnement"}, {"f": "réduire", "es": "reducir", "d": "Diminuer la quantité ou l'importance de quelque chose.", "ex": "Il faut réduire notre consommation d'énergie.", "t": "Environnement"}, {"f": "consommer responsable", "es": "consumir responsablemente", "d": "Acheter en tenant compte de l'impact sur l'environnement.", "ex": "Consommer responsable, c'est choisir des produits locaux.", "t": "Environnement"}, {"f": "transition écologique", "es": "transición ecológica", "d": "Passage vers un modèle plus respectueux de l'environnement.", "ex": "La transition écologique nécessite des investissements.", "t": "Environnement"}, {"f": "nucléaire", "es": "nuclear", "d": "Relatif à l'énergie produite par l'atome.", "ex": "Le débat sur le nucléaire divise la population.", "t": "Environnement"}, {"f": "pesticides", "es": "pesticidas", "d": "Produits chimiques utilisés pour détruire les nuisibles des cultures.", "ex": "Les pesticides contaminent les sols.", "t": "Environnement"}, {"f": "suremballage", "es": "exceso de embalaje", "d": "Emballage excessif d'un produit, source de déchets.", "ex": "Le suremballage augmente les déchets plastiques.", "t": "Environnement"}, {"f": "obsolescence programmée", "es": "obsolescencia programada", "d": "Conception d'un produit pour qu'il dure peu et soit remplacé.", "ex": "L'obsolescence programmée pousse à consommer davantage.", "t": "Environnement"}, {"f": "agriculture biologique", "es": "agricultura orgánica", "d": "Agriculture sans produits chimiques de synthèse.", "ex": "L'agriculture biologique respecte l'environnement.", "t": "Environnement"}, {"f": "prendre conscience", "es": "tomar conciencia", "d": "Devenir conscient de l'importance d'une réalité.", "ex": "Il faut prendre conscience de l'urgence climatique.", "t": "Environnement"}, {"f": "agir en faveur de", "es": "actuar a favor de", "d": "Faire des actions pour soutenir une cause.", "ex": "Beaucoup de jeunes agissent en faveur de l'environnement.", "t": "Environnement"}, {"f": "réduire son empreinte", "es": "reducir su huella", "d": "Diminuer son impact sur l'environnement.", "ex": "On peut réduire son empreinte en mangeant moins de viande.", "t": "Environnement"}, {"f": "protéger la planète", "es": "proteger el planeta", "d": "Préserver la Terre et ses ressources naturelles.", "ex": "Protéger la planète est l'affaire de tous.", "t": "Environnement"}, {"f": "lutter contre le réchauffement", "es": "luchar contra el calentamiento", "d": "Agir pour limiter la hausse des températures.", "ex": "Les gouvernements doivent lutter contre le réchauffement.", "t": "Environnement"}, {"f": "réseau social", "es": "red social", "d": "Plateforme en ligne où les gens échangent et partagent.", "ex": "Les réseaux sociaux influencent l'opinion publique.", "t": "Technologie"}, {"f": "navigateur", "es": "navegador", "d": "Logiciel qui permet de consulter des pages internet.", "ex": "Quel navigateur utilises-tu pour aller sur internet ?", "t": "Technologie"}, {"f": "moteur de recherche", "es": "motor de búsqueda", "d": "Outil en ligne qui permet de trouver des informations sur le web.", "ex": "Google est le moteur de recherche le plus utilisé.", "t": "Technologie"}, {"f": "données personnelles", "es": "datos personales", "d": "Informations privées qui identifient une personne.", "ex": "Il faut protéger ses données personnelles en ligne.", "t": "Technologie"}, {"f": "cybersécurité", "es": "ciberseguridad", "d": "Protection des systèmes informatiques contre les attaques.", "ex": "La cybersécurité est un enjeu majeur pour les entreprises.", "t": "Technologie"}, {"f": "intelligence artificielle", "es": "inteligencia artificial", "d": "Technologie qui permet aux machines d'imiter l'intelligence humaine.", "ex": "L'intelligence artificielle transforme le monde du travail.", "t": "Technologie"}, {"f": "robotique", "es": "robótica", "d": "Science qui conçoit et fabrique des robots.", "ex": "La robotique est en plein développement.", "t": "Technologie"}, {"f": "automatisation", "es": "automatización", "d": "Remplacement du travail humain par des machines.", "ex": "L'automatisation des tâches inquiète les travailleurs.", "t": "Technologie"}, {"f": "start-up", "es": "startup", "d": "Jeune entreprise innovante à fort potentiel de croissance.", "ex": "Il a fondé une start-up dans le domaine de l'éducation.", "t": "Technologie"}, {"f": "transformation numérique", "es": "transformación digital", "d": "Intégration des technologies numériques dans les activités.", "ex": "La transformation numérique change tous les secteurs.", "t": "Technologie"}, {"f": "application mobile", "es": "aplicación móvil", "d": "Programme conçu pour fonctionner sur un téléphone.", "ex": "J'ai téléchargé une nouvelle application mobile pour méditer.", "t": "Technologie"}, {"f": "commerce en ligne", "es": "comercio en línea", "d": "Achat et vente de produits sur internet.", "ex": "Le commerce en ligne a explosé pendant la pandémie.", "t": "Technologie"}, {"f": "paiement numérique", "es": "pago digital", "d": "Règlement effectué par voie électronique sans espèces.", "ex": "Le paiement numérique remplace progressivement les espèces.", "t": "Technologie"}, {"f": "cloud", "es": "nube", "d": "Espace de stockage de données accessible par internet.", "ex": "Je sauvegarde mes photos sur le cloud.", "t": "Technologie"}, {"f": "objets connectés", "es": "objetos conectados", "d": "Appareils reliés à internet qui échangent des données.", "ex": "Les objets connectés envahissent nos maisons.", "t": "Technologie"}, {"f": "fracture numérique", "es": "brecha digital", "d": "Inégalité d'accès aux technologies numériques.", "ex": "La fracture numérique exclut les personnes âgées.", "t": "Technologie"}, {"f": "désinformation", "es": "desinformación", "d": "Diffusion d'informations fausses pour tromper le public.", "ex": "La désinformation se propage vite sur internet.", "t": "Technologie"}, {"f": "vie privée", "es": "vida privada", "d": "Sphère personnelle qu'une personne souhaite garder secrète.", "ex": "Les réseaux sociaux menacent notre vie privée.", "t": "Technologie"}, {"f": "addiction aux écrans", "es": "adicción a las pantallas", "d": "Dépendance excessive aux appareils numériques.", "ex": "L'addiction aux écrans touche surtout les jeunes.", "t": "Technologie"}, {"f": "droit à la déconnexion", "es": "derecho a la desconexión", "d": "Droit de ne pas être joignable en dehors du travail.", "ex": "Le droit à la déconnexion protège les salariés.", "t": "Technologie"}, {"f": "être connecté", "es": "estar conectado", "d": "Être relié à internet ou joignable en ligne.", "ex": "Je suis toujours connecté grâce à mon smartphone.", "t": "Technologie"}, {"f": "surfer sur internet", "es": "navegar en internet", "d": "Naviguer de page en page sur le web.", "ex": "Je passe trop de temps à surfer sur internet.", "t": "Technologie"}, {"f": "protéger ses données", "es": "proteger sus datos", "d": "Mettre ses informations personnelles à l'abri.", "ex": "Il est important de protéger ses données personnelles.", "t": "Technologie"}, {"f": "faire des achats en ligne", "es": "hacer compras en línea", "d": "Acheter des produits sur internet.", "ex": "Je fais souvent mes achats en ligne.", "t": "Technologie"}, {"f": "être accro aux réseaux sociaux", "es": "ser adicto a las redes sociales", "d": "Être dépendant de l'usage des réseaux sociaux.", "ex": "Beaucoup d'adolescents sont accros aux réseaux sociaux.", "t": "Technologie"}, {"f": "loyer", "es": "alquiler", "d": "Somme payée régulièrement pour occuper un logement.", "ex": "Le loyer à Vancouver est très élevé.", "t": "VieQuotidienne"}, {"f": "bail", "es": "contrato de arrendamiento", "d": "Contrat de location entre propriétaire et locataire.", "ex": "J'ai signé un bail d'un an.", "t": "VieQuotidienne"}, {"f": "propriétaire", "es": "propietario", "d": "Personne qui possède un bien, comme un logement.", "ex": "Le propriétaire a augmenté le loyer.", "t": "VieQuotidienne"}, {"f": "locataire", "es": "inquilino", "d": "Personne qui loue un logement et paie un loyer.", "ex": "Les locataires doivent payer avant le 5 du mois.", "t": "VieQuotidienne"}, {"f": "charges", "es": "gastos comunes", "d": "Frais qui s'ajoutent au loyer pour les services communs.", "ex": "Les charges comprennent l'eau et le chauffage.", "t": "VieQuotidienne"}, {"f": "déménagement", "es": "mudanza", "d": "Action de changer de logement.", "ex": "Notre déménagement aura lieu samedi prochain.", "t": "VieQuotidienne"}, {"f": "quartier", "es": "barrio", "d": "Partie d'une ville où l'on habite.", "ex": "J'aime mon quartier, il est calme et agréable.", "t": "VieQuotidienne"}, {"f": "supermarché", "es": "supermercado", "d": "Grand magasin en libre-service où l'on achète à manger.", "ex": "Je vais au supermarché le samedi matin.", "t": "VieQuotidienne"}, {"f": "épicerie", "es": "tienda de abarrotes", "d": "Petit commerce qui vend des produits alimentaires.", "ex": "L'épicerie du coin est ouverte jusqu'à minuit.", "t": "VieQuotidienne"}, {"f": "marché", "es": "mercado", "d": "Lieu où l'on vend des produits frais en plein air ou couvert.", "ex": "Au marché, les fruits sont plus frais.", "t": "VieQuotidienne"}, {"f": "rayon", "es": "sección / pasillo", "d": "Partie d'un magasin réservée à un type de produits.", "ex": "Le rayon des fruits est au fond du magasin.", "t": "VieQuotidienne"}, {"f": "promotion (offre)", "es": "promoción / oferta", "d": "Réduction temporaire du prix d'un produit.", "ex": "Il y a une promotion sur le café cette semaine.", "t": "VieQuotidienne"}, {"f": "panier", "es": "canasta / carrito", "d": "Contenant pour transporter ses achats.", "ex": "Mon panier est plein, je vais à la caisse.", "t": "VieQuotidienne"}, {"f": "transport en commun", "es": "transporte público", "d": "Moyen de transport partagé par le public, comme le bus.", "ex": "Je prends les transports en commun pour aller travailler.", "t": "VieQuotidienne"}, {"f": "embouteillage", "es": "atasco / trancón", "d": "Accumulation de véhicules qui ralentit la circulation.", "ex": "J'ai été coincé dans un embouteillage pendant une heure.", "t": "VieQuotidienne"}, {"f": "covoiturage", "es": "coche compartido", "d": "Partage d'une voiture entre plusieurs personnes pour un trajet.", "ex": "Le covoiturage permet de partager les frais.", "t": "VieQuotidienne"}, {"f": "abonnement", "es": "abono / suscripción", "d": "Contrat qui donne accès régulier à un service.", "ex": "J'ai un abonnement mensuel au métro.", "t": "VieQuotidienne"}, {"f": "trajet", "es": "trayecto", "d": "Chemin parcouru d'un point à un autre.", "ex": "Mon trajet pour aller au travail dure 30 minutes.", "t": "VieQuotidienne"}, {"f": "sortie", "es": "salida", "d": "Moment où l'on quitte un lieu pour se divertir.", "ex": "Nous avons prévu une sortie au cinéma ce soir.", "t": "VieQuotidienne"}, {"f": "spectacle", "es": "espectáculo", "d": "Représentation donnée devant un public.", "ex": "Le spectacle commence à 20 heures.", "t": "VieQuotidienne"}, {"f": "exposition", "es": "exposición", "d": "Présentation d'œuvres ou d'objets au public.", "ex": "L'exposition de photos est gratuite ce mois-ci.", "t": "VieQuotidienne"}, {"f": "randonnée", "es": "caminata / senderismo", "d": "Longue promenade à pied dans la nature.", "ex": "Nous faisons une randonnée chaque dimanche.", "t": "VieQuotidienne"}, {"f": "association", "es": "asociación", "d": "Groupe de personnes réunies pour un but commun sans profit.", "ex": "Je fais partie d'une association de quartier.", "t": "VieQuotidienne"}, {"f": "bénévolat", "es": "voluntariado", "d": "Activité exercée gratuitement pour aider les autres.", "ex": "Le bénévolat est très valorisé au Canada.", "t": "VieQuotidienne"}, {"f": "emménager dans un appartement", "es": "mudarse a un apartamento", "d": "S'installer dans un nouveau logement.", "ex": "Nous allons emménager dans un appartement plus grand.", "t": "VieQuotidienne"}, {"f": "faire les courses", "es": "hacer las compras", "d": "Aller acheter ses provisions.", "ex": "Je dois faire les courses avant de rentrer.", "t": "VieQuotidienne"}, {"f": "prendre les transports en commun", "es": "tomar el transporte público", "d": "Utiliser les moyens de transport publics.", "ex": "Prendre les transports en commun est plus écologique.", "t": "VieQuotidienne"}, {"f": "s'inscrire à une activité", "es": "inscribirse en una actividad", "d": "S'enregistrer pour participer à une activité.", "ex": "Je veux m'inscrire à une activité sportive.", "t": "VieQuotidienne"}, {"f": "faire du bénévolat", "es": "hacer voluntariado", "d": "Donner de son temps gratuitement pour aider.", "ex": "Elle fait du bénévolat dans un refuge pour animaux.", "t": "VieQuotidienne"}, {"f": "journal", "es": "periódico", "d": "Publication qui rapporte l'actualité au quotidien.", "ex": "Je lis le journal tous les matins.", "t": "Medias"}, {"f": "quotidien", "es": "diario", "d": "Journal qui paraît tous les jours.", "ex": "Ce quotidien est très réputé pour son sérieux.", "t": "Medias"}, {"f": "hebdomadaire", "es": "semanario", "d": "Publication qui paraît une fois par semaine.", "ex": "Je suis abonné à un hebdomadaire de politique.", "t": "Medias"}, {"f": "article", "es": "artículo", "d": "Texte qui traite d'un sujet dans un journal ou une revue.", "ex": "J'ai lu un article intéressant sur l'environnement.", "t": "Medias"}, {"f": "éditorial", "es": "editorial", "d": "Article qui exprime l'opinion de la rédaction d'un journal.", "ex": "L'éditorial de ce journal est toujours engagé.", "t": "Medias"}, {"f": "rubrique", "es": "sección (de revista)", "d": "Partie d'un journal consacrée à un thème particulier.", "ex": "Ma rubrique préférée est celle des voyages.", "t": "Medias"}, {"f": "chronique", "es": "crónica", "d": "Article régulier d'un journaliste sur un sujet d'actualité.", "ex": "Sa chronique du matin est très drôle.", "t": "Medias"}, {"f": "émission", "es": "programa", "d": "Programme diffusé à la radio ou à la télévision.", "ex": "Je regarde cette émission tous les soirs.", "t": "Medias"}, {"f": "reportage", "es": "reportaje", "d": "Enquête journalistique sur le terrain présentée au public.", "ex": "Ce reportage sur la pauvreté m'a beaucoup touché.", "t": "Medias"}, {"f": "documentaire", "es": "documental", "d": "Film qui présente des faits réels de manière informative.", "ex": "J'ai vu un documentaire sur les océans hier soir.", "t": "Medias"}, {"f": "chaîne", "es": "canal", "d": "Réseau de télévision ou de radio qui diffuse des programmes.", "ex": "Cette chaîne diffuse beaucoup de films français.", "t": "Medias"}, {"f": "podcast", "es": "podcast", "d": "Émission audio que l'on écoute à la demande sur internet.", "ex": "J'écoute un podcast sur le développement personnel.", "t": "Medias"}, {"f": "diffusion en direct", "es": "transmisión en vivo", "d": "Transmission d'un événement au moment où il se déroule.", "ex": "La diffusion en direct du match commence à 19h.", "t": "Medias"}, {"f": "liberté de la presse", "es": "libertad de prensa", "d": "Droit des médias d'informer sans censure.", "ex": "La liberté de la presse est essentielle en démocratie.", "t": "Medias"}, {"f": "fake news", "es": "noticias falsas", "d": "Fausses informations diffusées comme si elles étaient vraies.", "ex": "Les fake news se propagent vite sur les réseaux.", "t": "Medias"}, {"f": "source fiable", "es": "fuente confiable", "d": "Origine d'information digne de confiance et vérifiée.", "ex": "Il faut toujours vérifier ses sources fiables.", "t": "Medias"}, {"f": "esprit critique", "es": "espíritu crítico", "d": "Capacité d'analyser et de juger une information par soi-même.", "ex": "Développer son esprit critique est important.", "t": "Medias"}, {"f": "vérification des faits", "es": "verificación de hechos", "d": "Contrôle de l'exactitude d'une information.", "ex": "La vérification des faits évite la désinformation.", "t": "Medias"}, {"f": "point de vue", "es": "punto de vista", "d": "Manière personnelle de voir ou de juger une question.", "ex": "Chacun a son point de vue sur cette question.", "t": "Medias"}, {"f": "débat", "es": "debate", "d": "Discussion organisée entre des personnes d'avis différents.", "ex": "Le débat à la télévision était passionnant.", "t": "Medias"}, {"f": "polémique", "es": "polémica", "d": "Vive discussion qui oppose des opinions contraires.", "ex": "Cette décision a créé une polémique.", "t": "Medias"}, {"f": "controverse", "es": "controversia", "d": "Désaccord public et prolongé sur une question.", "ex": "La controverse autour de ce sujet ne s'éteint pas.", "t": "Medias"}, {"f": "sondage", "es": "encuesta", "d": "Enquête d'opinion réalisée auprès d'un échantillon de gens.", "ex": "Selon un sondage récent, 60% des gens sont d'accord.", "t": "Medias"}, {"f": "opinion publique", "es": "opinión pública", "d": "Ensemble des avis partagés par la population.", "ex": "L'opinion publique est divisée sur cette question.", "t": "Medias"}, {"f": "être au courant", "es": "estar al tanto", "d": "Être informé de ce qui se passe.", "ex": "Es-tu au courant de la nouvelle loi ?", "t": "Medias"}, {"f": "suivre l'actualité", "es": "seguir la actualidad", "d": "Se tenir informé des nouvelles récentes.", "ex": "Je suis l'actualité chaque matin avec mon café.", "t": "Medias"}, {"f": "vérifier ses sources", "es": "verificar las fuentes", "d": "Contrôler la fiabilité d'où vient une information.", "ex": "Avant de partager, il faut vérifier ses sources.", "t": "Medias"}, {"f": "se forger une opinion", "es": "formarse una opinión", "d": "Construire son propre avis sur une question.", "ex": "Il faut lire plusieurs articles pour se forger une opinion.", "t": "Medias"}, {"f": "faire la une", "es": "ser portada", "d": "Être le sujet principal en première page d'un journal.", "ex": "Cette histoire a fait la une de tous les journaux.", "t": "Medias"}, {"f": "destination", "es": "destino", "d": "Lieu vers lequel on voyage.", "ex": "Notre prochaine destination de vacances sera l'Italie.", "t": "VoyagesCulture"}, {"f": "itinéraire", "es": "itinerario", "d": "Chemin prévu pour aller d'un lieu à un autre.", "ex": "J'ai préparé un itinéraire détaillé pour le voyage.", "t": "VoyagesCulture"}, {"f": "réservation", "es": "reserva", "d": "Action de retenir à l'avance une place ou une chambre.", "ex": "J'ai fait la réservation de l'hôtel hier.", "t": "VoyagesCulture"}, {"f": "hébergement", "es": "alojamiento", "d": "Lieu où l'on loge pendant un voyage.", "ex": "Notre hébergement est en plein centre-ville.", "t": "VoyagesCulture"}, {"f": "séjour", "es": "estancia", "d": "Période pendant laquelle on reste dans un lieu.", "ex": "Mon séjour à Paris a duré deux semaines.", "t": "VoyagesCulture"}, {"f": "visa", "es": "visa", "d": "Autorisation officielle d'entrer dans un pays.", "ex": "J'ai obtenu mon visa de travail pour le Canada.", "t": "VoyagesCulture"}, {"f": "passeport", "es": "pasaporte", "d": "Document officiel qui permet de voyager à l'étranger.", "ex": "Mon passeport expire dans six mois.", "t": "VoyagesCulture"}, {"f": "patrimoine", "es": "patrimonio", "d": "Ensemble des biens culturels hérités du passé.", "ex": "Ce monument fait partie du patrimoine mondial.", "t": "VoyagesCulture"}, {"f": "monument", "es": "monumento", "d": "Construction remarquable qui a une valeur historique.", "ex": "La tour Eiffel est le monument le plus visité de Paris.", "t": "VoyagesCulture"}, {"f": "musée", "es": "museo", "d": "Lieu où sont exposées des œuvres ou des objets de valeur.", "ex": "Le musée du Louvre est immense.", "t": "VoyagesCulture"}, {"f": "tradition", "es": "tradición", "d": "Coutume transmise de génération en génération.", "ex": "Cette tradition existe depuis des siècles.", "t": "VoyagesCulture"}, {"f": "coutume", "es": "costumbre", "d": "Habitude propre à un groupe ou à un pays.", "ex": "Chaque pays a ses propres coutumes.", "t": "VoyagesCulture"}, {"f": "gastronomie", "es": "gastronomía", "d": "Art de bien manger et cuisine d'une région.", "ex": "La gastronomie française est reconnue mondialement.", "t": "VoyagesCulture"}, {"f": "festival", "es": "festival", "d": "Grande manifestation culturelle ou artistique.", "ex": "Le festival de Cannes attire des stars du monde entier.", "t": "VoyagesCulture"}, {"f": "intégration", "es": "integración", "d": "Fait de s'insérer dans une société ou un groupe.", "ex": "L'intégration des immigrants est un défi important.", "t": "VoyagesCulture"}, {"f": "diversité", "es": "diversidad", "d": "Présence de réalités variées et différentes.", "ex": "Le Canada valorise la diversité culturelle.", "t": "VoyagesCulture"}, {"f": "multiculturalisme", "es": "multiculturalismo", "d": "Coexistence de plusieurs cultures dans une société.", "ex": "Le multiculturalisme est une richesse pour le pays.", "t": "VoyagesCulture"}, {"f": "communauté", "es": "comunidad", "d": "Groupe de personnes ayant des intérêts ou une origine communs.", "ex": "La communauté hispanique est très présente ici.", "t": "VoyagesCulture"}, {"f": "adaptation", "es": "adaptación", "d": "Fait de s'ajuster à une nouvelle situation.", "ex": "L'adaptation à un nouveau pays prend du temps.", "t": "VoyagesCulture"}, {"f": "dépaysement", "es": "cambio de aires", "d": "Sentiment de changement ressenti dans un lieu inconnu.", "ex": "J'ai eu un grand dépaysement en arrivant au Japon.", "t": "VoyagesCulture"}, {"f": "immersion", "es": "inmersión", "d": "Fait de se plonger entièrement dans une langue ou une culture.", "ex": "L'immersion linguistique est la meilleure façon d'apprendre.", "t": "VoyagesCulture"}, {"f": "échange culturel", "es": "intercambio cultural", "d": "Partage mutuel entre personnes de cultures différentes.", "ex": "Cet échange culturel a été très enrichissant.", "t": "VoyagesCulture"}, {"f": "ouverture d'esprit", "es": "mente abierta", "d": "Capacité d'accepter des idées et des cultures différentes.", "ex": "Voyager favorise l'ouverture d'esprit.", "t": "VoyagesCulture"}, {"f": "partir en voyage", "es": "irse de viaje", "d": "Quitter son lieu habituel pour voyager.", "ex": "Nous partons en voyage le mois prochain.", "t": "VoyagesCulture"}, {"f": "découvrir une culture", "es": "descubrir una cultura", "d": "Apprendre à connaître une nouvelle manière de vivre.", "ex": "J'adore découvrir une nouvelle culture.", "t": "VoyagesCulture"}, {"f": "s'adapter à un nouveau pays", "es": "adaptarse a un nuevo país", "d": "S'habituer à vivre dans un pays différent.", "ex": "S'adapter à un nouveau pays demande de la patience.", "t": "VoyagesCulture"}, {"f": "élargir ses horizons", "es": "ampliar horizontes", "d": "Enrichir ses connaissances et son ouverture au monde.", "ex": "Voyager permet d'élargir ses horizons.", "t": "VoyagesCulture"}, {"f": "vivre une expérience enrichissante", "es": "vivir una experiencia enriquecedora", "d": "Vivre quelque chose qui apporte beaucoup sur le plan personnel.", "ex": "J'ai vécu une expérience enrichissante au Canada.", "t": "VoyagesCulture"}, {"f": "vieillissement", "es": "envejecimiento", "d": "Processus par lequel une population devient plus âgée.", "ex": "Le vieillissement de la population est un défi.", "t": "Societe"}, {"f": "natalité", "es": "natalidad", "d": "Nombre de naissances dans une population.", "ex": "Le taux de natalité a baissé ces dernières années.", "t": "Societe"}, {"f": "espérance de vie", "es": "esperanza de vida", "d": "Durée de vie moyenne attendue d'une population.", "ex": "L'espérance de vie au Canada est de 82 ans.", "t": "Societe"}, {"f": "génération", "es": "generación", "d": "Ensemble des personnes nées à peu près à la même époque.", "ex": "Chaque génération a ses propres défis.", "t": "Societe"}, {"f": "population", "es": "población", "d": "Ensemble des habitants d'un lieu ou d'un pays.", "ex": "La population mondiale dépasse 8 milliards.", "t": "Societe"}, {"f": "pauvreté", "es": "pobreza", "d": "État de manque de ressources pour vivre dignement.", "ex": "La pauvreté touche encore beaucoup de familles.", "t": "Societe"}, {"f": "précarité", "es": "precariedad", "d": "Situation d'instabilité et d'insécurité, surtout économique.", "ex": "La précarité concerne de plus en plus de jeunes.", "t": "Societe"}, {"f": "discrimination", "es": "discriminación", "d": "Traitement injuste fondé sur l'origine, le sexe ou autre.", "ex": "La discrimination au travail est interdite par la loi.", "t": "Societe"}, {"f": "exclusion", "es": "exclusión", "d": "Fait de mettre quelqu'un à l'écart de la société.", "ex": "L'exclusion sociale est un problème grave.", "t": "Societe"}, {"f": "égalité des chances", "es": "igualdad de oportunidades", "d": "Principe selon lequel chacun a les mêmes possibilités de réussir.", "ex": "L'école doit garantir l'égalité des chances.", "t": "Societe"}, {"f": "solidarité", "es": "solidaridad", "d": "Aide mutuelle entre les membres d'un groupe.", "ex": "La solidarité s'est manifestée pendant la crise.", "t": "Societe"}, {"f": "cohésion sociale", "es": "cohesión social", "d": "Unité et liens qui maintiennent une société ensemble.", "ex": "La cohésion sociale est essentielle pour une société stable.", "t": "Societe"}, {"f": "citoyenneté", "es": "ciudadanía", "d": "Statut de membre d'un pays avec des droits et des devoirs.", "ex": "J'ai obtenu la citoyenneté canadienne l'année dernière.", "t": "Societe"}, {"f": "droits et devoirs", "es": "derechos y deberes", "d": "Ce que la loi accorde et exige de chaque citoyen.", "ex": "Chaque citoyen a des droits et des devoirs.", "t": "Societe"}, {"f": "engagement", "es": "compromiso", "d": "Fait de s'investir activement dans une cause.", "ex": "Son engagement pour la cause environnementale est admirable.", "t": "Societe"}, {"f": "ville", "es": "ciudad", "d": "Agglomération importante où vivent de nombreuses personnes.", "ex": "Vancouver est une ville magnifique.", "t": "Societe"}, {"f": "banlieue", "es": "periferia / suburbio", "d": "Zone située autour d'une grande ville.", "ex": "Nous habitons en banlieue, près de la nature.", "t": "Societe"}, {"f": "centre-ville", "es": "centro de la ciudad", "d": "Partie centrale et animée d'une ville.", "ex": "Le centre-ville est animé jour et nuit.", "t": "Societe"}, {"f": "espace vert", "es": "área verde", "d": "Zone de verdure dans une ville, comme un parc.", "ex": "Cette ville manque d'espaces verts.", "t": "Societe"}, {"f": "aménagement du territoire", "es": "ordenamiento territorial", "d": "Organisation de l'espace d'une région ou d'un pays.", "ex": "L'aménagement du territoire doit respecter l'environnement.", "t": "Societe"}, {"f": "lutter contre les inégalités", "es": "luchar contra las desigualdades", "d": "Agir pour réduire les écarts entre les personnes.", "ex": "Le gouvernement veut lutter contre les inégalités.", "t": "Societe"}, {"f": "vivre en société", "es": "vivir en sociedad", "d": "Vivre parmi les autres en respectant des règles communes.", "ex": "Vivre en société implique des compromis.", "t": "Societe"}, {"f": "exercer sa citoyenneté", "es": "ejercer la ciudadanía", "d": "Participer activement à la vie civique, par exemple en votant.", "ex": "Voter, c'est exercer sa citoyenneté.", "t": "Societe"}, {"f": "favoriser l'inclusion", "es": "favorecer la inclusión", "d": "Aider chacun à trouver sa place dans la société.", "ex": "L'école doit favoriser l'inclusion de tous les enfants.", "t": "Societe"}, {"f": "réduire les écarts", "es": "reducir las brechas", "d": "Diminuer les différences entre les groupes.", "ex": "Il faut réduire les écarts entre riches et pauvres.", "t": "Societe"}, {"f": "croissance", "es": "crecimiento", "d": "Augmentation de la production et de la richesse d'un pays.", "ex": "La croissance économique a ralenti cette année.", "t": "Economie"}, {"f": "inflation", "es": "inflación", "d": "Hausse générale et durable des prix.", "ex": "L'inflation a fortement augmenté le coût de la vie.", "t": "Economie"}, {"f": "chômage", "es": "desempleo", "d": "Situation des personnes sans emploi qui en cherchent un.", "ex": "Le taux de chômage a baissé ce trimestre.", "t": "Economie"}, {"f": "pouvoir d'achat", "es": "poder adquisitivo", "d": "Quantité de biens qu'on peut acheter avec son revenu.", "ex": "Le pouvoir d'achat des ménages diminue.", "t": "Economie"}, {"f": "investissement", "es": "inversión", "d": "Placement d'argent en vue d'un profit futur.", "ex": "Cet investissement immobilier est très rentable.", "t": "Economie"}, {"f": "budget", "es": "presupuesto", "d": "Prévision des recettes et des dépenses.", "ex": "Je gère mon budget mensuel avec une application.", "t": "Economie"}, {"f": "publicité", "es": "publicidad", "d": "Communication destinée à faire vendre un produit.", "ex": "La publicité influence nos choix de consommation.", "t": "Economie"}, {"f": "marketing", "es": "marketing", "d": "Ensemble des techniques pour vendre un produit.", "ex": "Le marketing digital se développe rapidement.", "t": "Economie"}, {"f": "consommation de masse", "es": "consumo masivo", "d": "Achat de produits en très grande quantité par la population.", "ex": "La consommation de masse a des conséquences écologiques.", "t": "Economie"}, {"f": "commerce équitable", "es": "comercio justo", "d": "Commerce qui assure un prix juste aux producteurs.", "ex": "J'achète du café issu du commerce équitable.", "t": "Economie"}, {"f": "boycott", "es": "boicot", "d": "Refus collectif d'acheter pour protester.", "ex": "Le boycott de cette marque a été efficace.", "t": "Economie"}, {"f": "épargne", "es": "ahorro", "d": "Argent mis de côté pour l'avenir.", "ex": "J'ai ouvert un compte épargne pour mes enfants.", "t": "Economie"}, {"f": "emprunt", "es": "préstamo", "d": "Somme d'argent que l'on emprunte et doit rembourser.", "ex": "Nous avons fait un emprunt pour acheter la maison.", "t": "Economie"}, {"f": "crédit", "es": "crédito", "d": "Prêt d'argent accordé par une banque.", "ex": "Le crédit à la consommation est en hausse.", "t": "Economie"}, {"f": "taux d'intérêt", "es": "tasa de interés", "d": "Pourcentage payé en plus du montant emprunté.", "ex": "Les taux d'intérêt ont augmenté cette année.", "t": "Economie"}, {"f": "endettement", "es": "endeudamiento", "d": "Situation d'une personne qui a des dettes.", "ex": "L'endettement des ménages inquiète les économistes.", "t": "Economie"}, {"f": "entreprise", "es": "empresa", "d": "Organisation qui produit des biens ou des services.", "ex": "Cette entreprise emploie plus de 500 personnes.", "t": "Economie"}, {"f": "concurrence", "es": "competencia", "d": "Rivalité entre entreprises pour attirer les clients.", "ex": "La concurrence est forte dans ce secteur.", "t": "Economie"}, {"f": "exportation", "es": "exportación", "d": "Vente de produits vers d'autres pays.", "ex": "L'exportation de bois est importante au Canada.", "t": "Economie"}, {"f": "importation", "es": "importación", "d": "Achat de produits venant d'autres pays.", "ex": "Les importations chinoises dominent le marché.", "t": "Economie"}, {"f": "mondialisation", "es": "globalización", "d": "Échanges croissants entre les pays du monde entier.", "ex": "La mondialisation a transformé l'économie.", "t": "Economie"}, {"f": "boucler ses fins de mois", "es": "llegar a fin de mes", "d": "Réussir à payer toutes ses dépenses jusqu'à la fin du mois.", "ex": "Beaucoup de familles ont du mal à boucler leurs fins de mois.", "t": "Economie"}, {"f": "faire des économies", "es": "ahorrar", "d": "Mettre de l'argent de côté en dépensant moins.", "ex": "J'essaie de faire des économies chaque mois.", "t": "Economie"}, {"f": "vivre au-dessus de ses moyens", "es": "vivir por encima de sus posibilidades", "d": "Dépenser plus d'argent qu'on en gagne.", "ex": "Il vit au-dessus de ses moyens et s'endette.", "t": "Economie"}, {"f": "comparer les prix", "es": "comparar precios", "d": "Regarder plusieurs prix avant d'acheter.", "ex": "Je compare toujours les prix avant d'acheter.", "t": "Economie"}, {"f": "consommer de manière responsable", "es": "consumir de manera responsable", "d": "Acheter en pensant à l'impact social et écologique.", "ex": "Consommer de manière responsable, c'est penser à la planète.", "t": "Economie"}];
+let pool = DATA.slice();
+let cur = null, correct = 0, total = 0, answered = false;
+let queue = [];          // cola de repaso prioritario (palabras falladas)
+let errors = {};         // mapa: palabra -> {d, es, t, count}
+let history = [];        // pila de cartas ya vistas, para "Précédent"
+let hPos = -1;           // posición actual dentro del historial
+
+function norm(s){ return s.trim().toLowerCase().replace(/\s+/g,' '); }
+// normaliza quitando acentos para comparar de forma flexible
+function strip(s){ return norm(s).normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+const sel = document.getElementById('theme');
+const themes = [...new Set(DATA.map(d => d.t))].sort();
+themes.forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; sel.appendChild(o); });
+sel.onchange = () => { pool = sel.value ? DATA.filter(d=>d.t===sel.value) : DATA.slice(); queue=[]; history=[]; hPos=-1; next(); };
+
+function pickCard(){
+  // 30% de probabilidad de repreguntar una fallada (si hay en cola)
+  if(queue.length && Math.random() < 0.35){
+    return queue.shift();
+  }
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function showCard(c){
+  // pinta una carta concreta (sin tocar el historial)
+  answered = false;
+  cur = c;
+  document.getElementById('tag').textContent = cur.t;
+  document.getElementById('def').textContent = cur.d;
+  document.getElementById('es').textContent = '🇪🇸 ' + cur.es;
+  document.getElementById('es').style.display = 'none';
+  document.getElementById('inp').value = '';
+  document.getElementById('fb').textContent = '';
+  document.getElementById('ansText').textContent = '';
+  document.getElementById('ans').classList.remove('ok2');
+  document.getElementById('espeak').classList.add('hidden');   // ocultar audio hasta corregir/revelar
+  document.getElementById('ex').style.display = 'none';
+  document.getElementById('ex').textContent = cur.ex;
+  document.getElementById('rewrite').style.display = 'none';
+  document.getElementById('rwinp').value = '';
+  document.getElementById('rwdone').textContent = '';
+  document.getElementById('inp').focus();
+}
+
+function next(){
+  // si veníamos navegando hacia atrás, re-avanzar por el historial
+  if(hPos < history.length - 1){
+    hPos++;
+    showCard(history[hPos]);
+    return;
+  }
+  // carta nueva
+  const c = pickCard();
+  history.push(c);
+  if(history.length > 200) history.shift();   // límite de memoria
+  hPos = history.length - 1;
+  showCard(c);
+}
+
+function prevQ(){
+  if(hPos > 0){ hPos--; showCard(history[hPos]); }
+}
+
+function showHint(){ document.getElementById('es').style.display='block'; }
+
+function reveal(){
+  if(answered) return;            // si ya respondiste, no hace nada
+  document.getElementById('es').style.display='block';   // muestra también el español
+  document.getElementById('ans').classList.remove('ok2');
+  document.getElementById('ansText').textContent = '→ ' + cur.f;
+  document.getElementById('espeak').classList.remove('hidden');  // mostrar botón audio 🔊
+  document.getElementById('ex').style.display='block';   // muestra el ejemplo
+  document.getElementById('fb').textContent = '';
+  // no cuenta como respuesta ni penaliza el score; únicamente revela
+}
+
+function check(){
+  if(answered) { next(); return; }
+  const val = norm(document.getElementById('inp').value);
+  if(!val) return;
+  total++; answered = true;
+  const fb = document.getElementById('fb');
+  const ansEl = document.getElementById('ans');
+  if(strip(val) === strip(cur.f)){
+    correct++; fb.textContent = '✅ Correct !'; fb.className='feedback ok';
+    // mostrar siempre la palabra correcta en verde, con audio al lado
+    ansEl.classList.add('ok2');
+    let txt = cur.f;
+    if(norm(val) !== norm(cur.f)) txt += '  (orthographe exacte)';
+    document.getElementById('ansText').textContent = txt;
+  } else {
+    fb.textContent = '❌ Pas tout à fait.'; fb.className='feedback no';
+    ansEl.classList.remove('ok2');
+    document.getElementById('ansText').textContent = '→ ' + cur.f;
+    addError(cur);
+    queue.push(cur);   // vuelve a la cola para repreguntar
+    // mostrar campo de reescritura
+    const rw = document.getElementById('rewrite');
+    rw.style.display='block';
+  }
+  document.getElementById('ex').style.display='block';
+  document.getElementById('espeak').classList.remove('hidden');  // mostrar botón audio 🔊 tras corregir
+  document.getElementById('score').textContent = 'Score : ' + correct + ' / ' + total;
+}
+
+// reescritura: confirma cuando escribe bien la palabra
+document.getElementById('rwinp').addEventListener('input', function(){
+  if(strip(this.value) === strip(cur.f) && norm(this.value)===norm(cur.f)){
+    document.getElementById('rwdone').textContent = '👍 Bien écrit ! Appuie sur « Suivant ».';
+  } else {
+    document.getElementById('rwdone').textContent = '';
+  }
+});
+
+function addError(c){
+  if(!errors[c.f]) errors[c.f] = {d:c.d, es:c.es, t:c.t, count:0};
+  errors[c.f].count++;
+  renderErrors();
+}
+function renderErrors(){
+  const ul = document.getElementById('errlist');
+  ul.innerHTML='';
+  const keys = Object.keys(errors);
+  document.getElementById('errcount').textContent = keys.length;
+  keys.forEach(w => {
+    const e = errors[w];
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="w">'+w+'</span> — <span class="small">'+e.es+' · '+e.t+(e.count>1?(' · ×'+e.count):'')+'</span>';
+    ul.appendChild(li);
+  });
+}
+function clearErrors(){ errors={}; renderErrors(); }
+
+document.getElementById('inp').addEventListener('keydown', e => { if(e.key==='Enter') check(); });
+next();
+
+/* ===== Tabs ===== */
+function showTab(which){
+  const ec = which==='ecrit';
+  document.getElementById('viewEcrit').classList.toggle('hidden', !ec);
+  document.getElementById('viewFlash').classList.toggle('hidden', ec);
+  document.getElementById('tabEcrit').classList.toggle('active', ec);
+  document.getElementById('tabFlash').classList.toggle('active', !ec);
+}
+
+/* ===== Flashcards ===== */
+// Usa el mismo pool que el modo Écriture (respeta el filtro de thème),
+// pero mantiene su propio "orden" (secuencial o aleatorio).
+let fIndex = 0, fRandom = false, fOrder = [];
+
+function buildOrder(){
+  fOrder = pool.map((_, i) => i);   // índices 0..n-1 en orden
+  if(fRandom){
+    for(let i = fOrder.length - 1; i > 0; i--){   // Fisher-Yates shuffle
+      const j = Math.floor(Math.random() * (i + 1));
+      [fOrder[i], fOrder[j]] = [fOrder[j], fOrder[i]];
+    }
+  }
+  fIndex = 0;
+}
+
+function fRender(){
+  if(!pool.length){ return; }
+  if(!fOrder.length || fOrder.length !== pool.length) buildOrder();
+  if(fIndex >= fOrder.length) fIndex = 0;
+  if(fIndex < 0) fIndex = fOrder.length - 1;
+  const c = pool[fOrder[fIndex]];
+  document.getElementById('ftag').textContent = c.t;
+  document.getElementById('fword').textContent = c.f;
+  document.getElementById('fes').textContent = '🇪🇸 ' + c.es;
+  document.getElementById('fdef').textContent = c.d;
+  document.getElementById('fex').textContent = '“' + c.ex + '”';
+  // la traducción al español arranca oculta en cada tarjeta
+  document.getElementById('fes').classList.add('hidden');
+  document.getElementById('showesBtn').textContent = '🇪🇸 Voir la traduction';
+  document.getElementById('fcount').textContent = (fIndex+1) + ' / ' + fOrder.length;
+}
+function toggleEs(){
+  const es = document.getElementById('fes');
+  const hidden = es.classList.toggle('hidden');
+  document.getElementById('showesBtn').textContent = hidden ? '🇪🇸 Voir la traduction' : '🇪🇸 Masquer la traduction';
+}
+function toggleRandom(){
+  fRandom = !fRandom;
+  document.getElementById('randomBtn').textContent = '🔀 Aléatoire : ' + (fRandom ? 'ON' : 'OFF');
+  buildOrder();
+  fRender();
+}
+function fnext(){ fIndex++; fRender(); }
+function fprev(){ fIndex--; fRender(); }
+
+// cuando cambia el thème, reconstruimos el orden de flashcards
+const _selOnchange = sel.onchange;
+sel.onchange = () => { _selOnchange(); buildOrder(); fRender(); };
+
+/* ===== Audio (pronunciación FR via SpeechSynthesis) ===== */
+let frVoices = [], selectedVoice = null;
+const VOICE_KEY = 'pv_voice_fr';
+
+function loadVoices(){
+  if(!window.speechSynthesis) return;
+  const all = window.speechSynthesis.getVoices();
+  // Priorizar voces francesas; si no hay, mostrar todas como fallback
+  frVoices = all.filter(v => /^fr/i.test(v.lang));
+  const list = frVoices.length ? frVoices : all;
+  const selEl = document.getElementById('voiceSel');
+  if(!selEl) return;
+  selEl.innerHTML = '';
+  if(!list.length){
+    const o = document.createElement('option');
+    o.textContent = 'Voix par défaut du système';
+    o.value = '';
+    selEl.appendChild(o);
+    return;
+  }
+  const saved = localStorage.getItem(VOICE_KEY);
+  list.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v.name;
+    o.textContent = v.name + ' (' + v.lang + ')';
+    selEl.appendChild(o);
+  });
+  // restaurar selección guardada o tomar la primera fr-FR
+  let chosen = list.find(v => v.name === saved) ||
+               list.find(v => /fr[-_]FR/i.test(v.lang)) || list[0];
+  selEl.value = chosen.name;
+  selectedVoice = chosen;
+}
+function onVoiceChange(){
+  const name = document.getElementById('voiceSel').value;
+  const all = window.speechSynthesis.getVoices();
+  selectedVoice = all.find(v => v.name === name) || null;
+  if(selectedVoice) localStorage.setItem(VOICE_KEY, selectedVoice.name);
+  speak(); // previsualizar la voz elegida
+}
+if(window.speechSynthesis){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+// pronuncia cualquier texto en francés con la voz seleccionada
+function speakWord(text){
+  if(!text) return;
+  if(!window.speechSynthesis){ alert("Ton navigateur ne supporte pas la synthèse vocale."); return; }
+  if(!selectedVoice){ loadVoices(); }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = (selectedVoice && selectedVoice.lang) || 'fr-FR';
+  if(selectedVoice) u.voice = selectedVoice;
+  u.rate = 0.9;
+  window.speechSynthesis.speak(u);
+}
+// usado por las flashcards (lee la palabra de la carta actual)
+function speak(){
+  const c = pool[fOrder[fIndex]];
+  if(c) speakWord(c.f);
+}
+
+/* ===== Accesibilité clavier (mode Flashcards) ===== */
+// Espace = suivant · Delete/Backspace = précédent · P ou ↑ = écouter · →/← aussi
+document.addEventListener('keydown', e => {
+  // solo actuar en la pestaña Flashcards
+  if(document.getElementById('viewFlash').classList.contains('hidden')) return;
+  // no interferir si se está escribiendo en un campo
+  const tag = (e.target && e.target.tagName) || '';
+  if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+  const k = e.key;
+  if(k === ' ' || k === 'Spacebar' || k === 'ArrowRight'){
+    e.preventDefault(); fnext();
+  } else if(k === 'Backspace' || k === 'Delete' || k === 'ArrowLeft'){
+    e.preventDefault(); fprev();
+  } else if(k === 'p' || k === 'P' || k === 'ArrowUp'){
+    e.preventDefault(); speak();
+  } else if(k === 't' || k === 'T'){
+    e.preventDefault(); toggleEs();   // T = traduction (bonus)
+  }
+});
+
+// Inicializar flashcards al cargar (es la pestaña por defecto)
+fRender();
+</script>
+</body>
+</html>
