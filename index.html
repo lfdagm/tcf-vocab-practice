@@ -759,7 +759,7 @@ function renderFill(v){
   });
   document.querySelectorAll("#fillArea .ftell").forEach(btn => {
     btn.addEventListener("click", function(){
-      btn.closest("td").querySelector(".fsol").classList.remove("hidden");
+      btn.closest("td").querySelector(".fsol").classList.toggle("hidden");
     });
   });
 }
@@ -769,7 +769,7 @@ function fillCheckOne(inp){
   const sol = inp.closest("td").querySelector(".fsol");
   inp.classList.remove("ok", "ko");
   if(!flex(val)){ sol.classList.remove("hidden"); return; }
-  if(flexNoAcc(val) === flexNoAcc(ans)){ inp.classList.add("ok"); sol.classList.add("hidden"); }
+  if(flex(val) === flex(ans)){ inp.classList.add("ok"); sol.classList.add("hidden"); }
   else { inp.classList.add("ko"); sol.classList.remove("hidden"); }
 }
 function fillCheck(){
@@ -782,7 +782,7 @@ function fillCheck(){
     inp.classList.remove("ok", "ko");
     if(!flex(val)){ return; }   // vide : on ne marque pas
     filled++;
-    if(flexNoAcc(val) === flexNoAcc(ans)){ inp.classList.add("ok"); if(sol) sol.classList.add("hidden"); ok++; }
+    if(flex(val) === flex(ans)){ inp.classList.add("ok"); if(sol) sol.classList.add("hidden"); ok++; }
     else { inp.classList.add("ko"); if(sol) sol.classList.remove("hidden"); }
   });
   document.getElementById("fscore").textContent =
