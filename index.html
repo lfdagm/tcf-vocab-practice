@@ -58,6 +58,54 @@
   .voicebar label { font-size:13px; color:#888; }
   .voicebar select { width:auto; min-width:160px; max-width:100%; margin-top:0; }
   .showes { background:#eef3ff; color:#1a73e8; border:1px solid #cfe0ff; font-size:14px; padding:8px 14px; border-radius:8px; cursor:pointer; flex:0 0 auto; min-width:0; }
+  /* ===== Conjugaison ===== */
+  .csub { display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+  .csub button { flex:0 0 auto; min-width:0; background:#e3e3e8; color:#444; padding:9px 18px; font-size:14px; }
+  .csub button.active { background:#7b3fe4; color:#fff; }
+  .qcard { background:#fff; border-radius:16px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,.08); }
+  .qprompt { font-size:16px; color:#444; margin-bottom:6px; }
+  .qverb { font-size:26px; font-weight:bold; color:#7b3fe4; text-align:center; margin:4px 0; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .qmeta { text-align:center; font-size:15px; color:#666; margin-bottom:4px; }
+  .qtense { display:inline-block; background:#f0e9fc; color:#7b3fe4; font-weight:bold; padding:3px 12px; border-radius:20px; }
+  .qpron { font-size:20px; font-weight:bold; color:#222; text-align:center; margin:14px 0 6px; }
+  .qdef { font-size:14px; color:#888; font-style:italic; text-align:center; margin-bottom:4px; }
+  .conjnav { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .vtable { width:100%; border-collapse:collapse; margin-top:0; font-size:15px; }
+  .vtable th { background:#f0e9fc; color:#7b3fe4; padding:9px; text-align:left; font-size:13px; }
+  .vtable td { border-bottom:1px solid #f0f0f0; padding:8px 9px; }
+  .vtable td.pron { color:#999; width:80px; }
+  /* grille 2 colonnes pour réduire le scroll */
+  .tgrid { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:repeat(3,auto); grid-auto-flow:column; gap:14px 18px; margin-top:14px; align-items:start; }
+  .tgrid .vtable { margin-top:0; }
+  @media (max-width:560px){ .tgrid { grid-template-columns:1fr; } }
+  /* mode Remplir : inputs dans le tableau */
+  .ftable input { width:100%; font-size:14px; padding:6px 7px; border:1.5px solid #ddd; border-radius:6px; font-family:inherit; }
+  .ftable input.ok { border-color:#1a8a3a; background:#eefaf0; color:#1a8a3a; font-weight:bold; }
+  .ftable input.ko { border-color:#d33; background:#fdeeee; }
+  .ftable td.sol { color:#1a8a3a; font-weight:bold; font-size:14px; }
+  .ftitle { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
+  .ftitle .vtitle { font-size:21px; }
+  .fbtns { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .fscore { text-align:center; font-size:15px; color:#666; margin-top:12px; min-height:20px; font-weight:bold; }
+  .vsearch { width:100%; font-size:17px; padding:11px; border:2px solid #ccc; border-radius:10px; margin-bottom:6px; }
+  .vsugg { list-style:none; padding:0; margin:0 0 10px; max-height:180px; overflow:auto; border:1px solid #eee; border-radius:8px; display:none; }
+  .vsugg li { padding:9px 12px; cursor:pointer; border-bottom:1px solid #f3f3f3; }
+  .vsugg li:hover { background:#f5f0fe; }
+  /* layout con lista de verbos a la izquierda */
+  .conjwrap { display:flex; gap:16px; align-items:flex-start; }
+  .vlist { flex:0 0 180px; background:#fff; border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,.07); padding:10px; max-height:74vh; overflow:auto; }
+  .vlist h4 { margin:4px 6px 8px; font-size:13px; color:#7b3fe4; }
+  .vlist ul { list-style:none; padding:0; margin:0; }
+  .vlist li { padding:7px 9px; border-radius:8px; font-size:14px; cursor:pointer; color:#333; }
+  .vlist li:hover { background:#f5f0fe; }
+  .vlist li.sel { background:#7b3fe4; color:#fff; }
+  .conjmain { flex:1; min-width:0; }
+  @media (max-width:560px){
+    .conjwrap { flex-direction:column; }
+    .vlist { flex:1 1 auto; width:100%; max-height:200px; }
+  }
+  .vhead { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:4px; }
+  .vtitle { font-size:23px; font-weight:bold; color:#7b3fe4; display:flex; align-items:center; gap:8px; }
 </style>
 </head>
 <body>
@@ -66,11 +114,13 @@
 <div class="tabs">
   <button id="tabFlash" class="active" onclick="showTab('flash')">🃏 Flashcards</button>
   <button id="tabEcrit" onclick="showTab('ecrit')">✍️ Écriture</button>
+  <button id="tabConj" onclick="showTab('conj')">🔄 Conjugaison</button>
 </div>
 
 <select id="theme">
   <option value="">Tous les thèmes</option>
 </select>
+<!-- la barre de thèmes est masquée dans l'onglet Conjugaison (voir showTab) -->
 
 <div id="viewEcrit" class="hidden">
 <div class="layout">
@@ -142,6 +192,76 @@
       ⌨️ Espace / → : suivante · Suppr / ← : précédente · P / ↑ : écouter · T : traduction
     </div>
   </div>
+</div>
+
+<!-- ===================== CONJUGAISON ===================== -->
+<div id="viewConj" class="hidden">
+  <div class="csub">
+    <button id="csubQuiz" class="active" onclick="showConj('quiz')">🎯 Quiz aléatoire</button>
+    <button id="csubFill" onclick="showConj('fill')">📝 Remplir</button>
+    <button id="csubTable" onclick="showConj('table')">📖 Tableau</button>
+  </div>
+
+  <div class="conjwrap">
+  <!-- LISTE DES VERBES (gauche) -->
+  <div class="vlist">
+    <input class="vsearch" id="vsearch" type="text" autocomplete="off" placeholder="🔍 Chercher..." style="font-size:14px; padding:8px; margin-bottom:8px;">
+    <h4 id="vlistTitle">Verbes (—)</h4>
+    <ul id="vlistUl"></ul>
+  </div>
+
+  <div class="conjmain">
+  <!-- QUIZ -->
+  <div id="conjQuiz">
+    <div class="main">
+      <div class="qcard">
+        <div class="qprompt">Conjugue le verbe :</div>
+        <div class="qverb">
+          <span id="qverb">—</span>
+          <button class="speak" onclick="speakWord(qCur && qCur.verb.inf)" title="Écouter">🔊</button>
+        </div>
+        <div class="qdef" id="qdef"></div>
+        <div class="qmeta">à <span class="qtense" id="qtense"></span></div>
+        <div class="qpron" id="qpron">—</div>
+        <input id="qinp" type="text" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Écris la forme conjuguée...">
+        <div class="row">
+          <button class="verif" onclick="qCheck()">Vérifier</button>
+        </div>
+        <div class="row">
+          <button class="sec" onclick="qReveal()">Voir la réponse</button>
+          <button class="sec" onclick="qNext()">Suivant ›</button>
+        </div>
+        <div class="feedback" id="qfb"></div>
+        <div class="answer" id="qans"><span id="qansText"></span>
+          <button class="speak hidden" id="qspeak" onclick="speakWord(qCur && qCur.answer)" title="Écouter">🔊</button>
+        </div>
+      </div>
+      <div class="score" id="qscore">Score : 0 / 0</div>
+      <div class="fcount" style="font-size:12px; color:#aaa; margin-top:6px;">
+        ⌨️ Entrée : vérifier, puis passer au suivant
+      </div>
+    </div>
+  </div>
+
+  <!-- REMPLIR LE TABLEAU -->
+  <div id="conjFill" class="hidden">
+    <div class="main">
+      <div class="qcard">
+        <div id="fillArea"><div style="color:#999; text-align:center; padding:20px 0;">← Choisis un verbe dans la liste pour le conjuguer.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLEAU -->
+  <div id="conjTable" class="hidden">
+    <div class="main">
+      <div class="qcard">
+        <div id="vresult"><div style="color:#999; text-align:center; padding:20px 0;">← Choisis un verbe dans la liste.</div></div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /conjmain -->
+  </div><!-- /conjwrap -->
 </div>
 
 <script>
@@ -285,11 +405,18 @@ next();
 
 /* ===== Tabs ===== */
 function showTab(which){
-  const ec = which==='ecrit';
-  document.getElementById('viewEcrit').classList.toggle('hidden', !ec);
-  document.getElementById('viewFlash').classList.toggle('hidden', ec);
-  document.getElementById('tabEcrit').classList.toggle('active', ec);
-  document.getElementById('tabFlash').classList.toggle('active', !ec);
+  document.getElementById('viewEcrit').classList.toggle('hidden', which!=='ecrit');
+  document.getElementById('viewFlash').classList.toggle('hidden', which!=='flash');
+  document.getElementById('viewConj').classList.toggle('hidden', which!=='conj');
+  document.getElementById('tabEcrit').classList.toggle('active', which==='ecrit');
+  document.getElementById('tabFlash').classList.toggle('active', which==='flash');
+  document.getElementById('tabConj').classList.toggle('active', which==='conj');
+  // la barre de thèmes ne sert qu'aux onglets vocabulaire
+  document.getElementById('theme').style.display = (which==='conj') ? 'none' : '';
+  if(which==='conj'){
+    renderVList();
+    if(!qCur) qNext();   // première question du quiz
+  }
 }
 
 /* ===== Flashcards ===== */
@@ -427,6 +554,222 @@ document.addEventListener('keydown', e => {
 
 // Inicializar flashcards al cargar (es la pestaña por defecto)
 fRender();
+
+
+/* ============ CONJUGAISON ============ */
+const VERBS = [{"inf":"être","es":"ser / estar","def":"Exister, ou servir d'auxiliaire et de lien entre le sujet et un attribut.","aux":"avoir","present":["suis","es","est","sommes","êtes","sont"],"imparfait":["étais","étais","était","étions","étiez","étaient"],"passe_compose":["ai été","as été","a été","avons été","avez été","ont été"],"futur":["serai","seras","sera","serons","serez","seront"],"conditionnel":["serais","serais","serait","serions","seriez","seraient"],"subjonctif":["sois","sois","soit","soyons","soyez","soient"]},{"inf":"avoir","es":"tener / haber","def":"Posséder quelque chose, ou servir d'auxiliaire pour former les temps composés.","aux":"avoir","present":["ai","as","a","avons","avez","ont"],"imparfait":["avais","avais","avait","avions","aviez","avaient"],"passe_compose":["ai eu","as eu","a eu","avons eu","avez eu","ont eu"],"futur":["aurai","auras","aura","aurons","aurez","auront"],"conditionnel":["aurais","aurais","aurait","aurions","auriez","auraient"],"subjonctif":["aie","aies","ait","ayons","ayez","aient"]},{"inf":"aller","es":"ir","def":"Se déplacer d'un lieu vers un autre.","aux":"être","present":["vais","vas","va","allons","allez","vont"],"imparfait":["allais","allais","allait","allions","alliez","allaient"],"passe_compose":["suis allé(e)","es allé(e)","est allé(e)","sommes allé(e)s","êtes allé(e)s","sont allé(e)s"],"futur":["irai","iras","ira","irons","irez","iront"],"conditionnel":["irais","irais","irait","irions","iriez","iraient"],"subjonctif":["aille","ailles","aille","allions","alliez","aillent"]},{"inf":"faire","es":"hacer","def":"Réaliser, fabriquer ou accomplir une action.","aux":"avoir","present":["fais","fais","fait","faisons","faites","font"],"imparfait":["faisais","faisais","faisait","faisions","faisiez","faisaient"],"passe_compose":["ai fait","as fait","a fait","avons fait","avez fait","ont fait"],"futur":["ferai","feras","fera","ferons","ferez","feront"],"conditionnel":["ferais","ferais","ferait","ferions","feriez","feraient"],"subjonctif":["fasse","fasses","fasse","fassions","fassiez","fassent"]},{"inf":"dire","es":"decir","def":"Exprimer quelque chose par la parole.","aux":"avoir","present":["dis","dis","dit","disons","dites","disent"],"imparfait":["disais","disais","disait","disions","disiez","disaient"],"passe_compose":["ai dit","as dit","a dit","avons dit","avez dit","ont dit"],"futur":["dirai","diras","dira","dirons","direz","diront"],"conditionnel":["dirais","dirais","dirait","dirions","diriez","diraient"],"subjonctif":["dise","dises","dise","disions","disiez","disent"]},{"inf":"pouvoir","es":"poder","def":"Avoir la capacité ou la permission de faire quelque chose.","aux":"avoir","present":["peux","peux","peut","pouvons","pouvez","peuvent"],"imparfait":["pouvais","pouvais","pouvait","pouvions","pouviez","pouvaient"],"passe_compose":["ai pu","as pu","a pu","avons pu","avez pu","ont pu"],"futur":["pourrai","pourras","pourra","pourrons","pourrez","pourront"],"conditionnel":["pourrais","pourrais","pourrait","pourrions","pourriez","pourraient"],"subjonctif":["puisse","puisses","puisse","puissions","puissiez","puissent"]},{"inf":"vouloir","es":"querer","def":"Désirer ou avoir la volonté de faire quelque chose.","aux":"avoir","present":["veux","veux","veut","voulons","voulez","veulent"],"imparfait":["voulais","voulais","voulait","voulions","vouliez","voulaient"],"passe_compose":["ai voulu","as voulu","a voulu","avons voulu","avez voulu","ont voulu"],"futur":["voudrai","voudras","voudra","voudrons","voudrez","voudront"],"conditionnel":["voudrais","voudrais","voudrait","voudrions","voudriez","voudraient"],"subjonctif":["veuille","veuilles","veuille","voulions","vouliez","veuillent"]},{"inf":"devoir","es":"deber","def":"Être obligé de faire quelque chose, ou avoir une dette.","aux":"avoir","present":["dois","dois","doit","devons","devez","doivent"],"imparfait":["devais","devais","devait","devions","deviez","devaient"],"passe_compose":["ai dû","as dû","a dû","avons dû","avez dû","ont dû"],"futur":["devrai","devras","devra","devrons","devrez","devront"],"conditionnel":["devrais","devrais","devrait","devrions","devriez","devraient"],"subjonctif":["doive","doives","doive","devions","deviez","doivent"]},{"inf":"savoir","es":"saber","def":"Connaître quelque chose ou être capable de le faire.","aux":"avoir","present":["sais","sais","sait","savons","savez","savent"],"imparfait":["savais","savais","savait","savions","saviez","savaient"],"passe_compose":["ai su","as su","a su","avons su","avez su","ont su"],"futur":["saurai","sauras","saura","saurons","saurez","sauront"],"conditionnel":["saurais","saurais","saurait","saurions","sauriez","sauraient"],"subjonctif":["sache","saches","sache","sachions","sachiez","sachent"]},{"inf":"voir","es":"ver","def":"Percevoir par les yeux.","aux":"avoir","present":["vois","vois","voit","voyons","voyez","voient"],"imparfait":["voyais","voyais","voyait","voyions","voyiez","voyaient"],"passe_compose":["ai vu","as vu","a vu","avons vu","avez vu","ont vu"],"futur":["verrai","verras","verra","verrons","verrez","verront"],"conditionnel":["verrais","verrais","verrait","verrions","verriez","verraient"],"subjonctif":["voie","voies","voie","voyions","voyiez","voient"]},{"inf":"venir","es":"venir","def":"Se déplacer vers le lieu où se trouve la personne qui parle.","aux":"être","present":["viens","viens","vient","venons","venez","viennent"],"imparfait":["venais","venais","venait","venions","veniez","venaient"],"passe_compose":["suis venu(e)","es venu(e)","est venu(e)","sommes venu(e)s","êtes venu(e)s","sont venu(e)s"],"futur":["viendrai","viendras","viendra","viendrons","viendrez","viendront"],"conditionnel":["viendrais","viendrais","viendrait","viendrions","viendriez","viendraient"],"subjonctif":["vienne","viennes","vienne","venions","veniez","viennent"]},{"inf":"prendre","es":"tomar / coger","def":"Saisir, attraper ou emporter quelque chose.","aux":"avoir","present":["prends","prends","prend","prenons","prenez","prennent"],"imparfait":["prenais","prenais","prenait","prenions","preniez","prenaient"],"passe_compose":["ai pris","as pris","a pris","avons pris","avez pris","ont pris"],"futur":["prendrai","prendras","prendra","prendrons","prendrez","prendront"],"conditionnel":["prendrais","prendrais","prendrait","prendrions","prendriez","prendraient"],"subjonctif":["prenne","prennes","prenne","prenions","preniez","prennent"]},{"inf":"mettre","es":"poner","def":"Placer quelque chose à un endroit.","aux":"avoir","present":["mets","mets","met","mettons","mettez","mettent"],"imparfait":["mettais","mettais","mettait","mettions","mettiez","mettaient"],"passe_compose":["ai mis","as mis","a mis","avons mis","avez mis","ont mis"],"futur":["mettrai","mettras","mettra","mettrons","mettrez","mettront"],"conditionnel":["mettrais","mettrais","mettrait","mettrions","mettriez","mettraient"],"subjonctif":["mette","mettes","mette","mettions","mettiez","mettent"]},{"inf":"partir","es":"salir / partir","def":"Quitter un lieu, s'en aller.","aux":"être","present":["pars","pars","part","partons","partez","partent"],"imparfait":["partais","partais","partait","partions","partiez","partaient"],"passe_compose":["suis parti(e)","es parti(e)","est parti(e)","sommes parti(e)s","êtes parti(e)s","sont parti(e)s"],"futur":["partirai","partiras","partira","partirons","partirez","partiront"],"conditionnel":["partirais","partirais","partirait","partirions","partiriez","partiraient"],"subjonctif":["parte","partes","parte","partions","partiez","partent"]},{"inf":"sortir","es":"salir","def":"Aller à l'extérieur d'un lieu.","aux":"être","present":["sors","sors","sort","sortons","sortez","sortent"],"imparfait":["sortais","sortais","sortait","sortions","sortiez","sortaient"],"passe_compose":["suis sorti(e)","es sorti(e)","est sorti(e)","sommes sorti(e)s","êtes sorti(e)s","sont sorti(e)s"],"futur":["sortirai","sortiras","sortira","sortirons","sortirez","sortiront"],"conditionnel":["sortirais","sortirais","sortirait","sortirions","sortiriez","sortiraient"],"subjonctif":["sorte","sortes","sorte","sortions","sortiez","sortent"]},{"inf":"finir","es":"terminar","def":"Mener quelque chose à son terme, achever.","aux":"avoir","present":["finis","finis","finit","finissons","finissez","finissent"],"imparfait":["finissais","finissais","finissait","finissions","finissiez","finissaient"],"passe_compose":["ai fini","as fini","a fini","avons fini","avez fini","ont fini"],"futur":["finirai","finiras","finira","finirons","finirez","finiront"],"conditionnel":["finirais","finirais","finirait","finirions","finiriez","finiraient"],"subjonctif":["finisse","finisses","finisse","finissions","finissiez","finissent"]},{"inf":"parler","es":"hablar","def":"S'exprimer au moyen de la parole.","aux":"avoir","present":["parle","parles","parle","parlons","parlez","parlent"],"imparfait":["parlais","parlais","parlait","parlions","parliez","parlaient"],"passe_compose":["ai parlé","as parlé","a parlé","avons parlé","avez parlé","ont parlé"],"futur":["parlerai","parleras","parlera","parlerons","parlerez","parleront"],"conditionnel":["parlerais","parlerais","parlerait","parlerions","parleriez","parleraient"],"subjonctif":["parle","parles","parle","parlions","parliez","parlent"]},{"inf":"aimer","es":"amar / gustar","def":"Éprouver de l'affection ou de l'attirance pour quelqu'un ou quelque chose.","aux":"avoir","present":["aime","aimes","aime","aimons","aimez","aiment"],"imparfait":["aimais","aimais","aimait","aimions","aimiez","aimaient"],"passe_compose":["ai aimé","as aimé","a aimé","avons aimé","avez aimé","ont aimé"],"futur":["aimerai","aimeras","aimera","aimerons","aimerez","aimeront"],"conditionnel":["aimerais","aimerais","aimerait","aimerions","aimeriez","aimeraient"],"subjonctif":["aime","aimes","aime","aimions","aimiez","aiment"]},{"inf":"manger","es":"comer","def":"Absorber un aliment pour se nourrir.","aux":"avoir","present":["mange","manges","mange","mangeons","mangez","mangent"],"imparfait":["mangeais","mangeais","mangeait","mangions","mangiez","mangeaient"],"passe_compose":["ai mangé","as mangé","a mangé","avons mangé","avez mangé","ont mangé"],"futur":["mangerai","mangeras","mangera","mangerons","mangerez","mangeront"],"conditionnel":["mangerais","mangerais","mangerait","mangerions","mangeriez","mangeraient"],"subjonctif":["mange","manges","mange","mangions","mangiez","mangent"]},{"inf":"commencer","es":"comenzar","def":"Entreprendre la première partie d'une action.","aux":"avoir","present":["commence","commences","commence","commençons","commencez","commencent"],"imparfait":["commençais","commençais","commençait","commencions","commenciez","commençaient"],"passe_compose":["ai commencé","as commencé","a commencé","avons commencé","avez commencé","ont commencé"],"futur":["commencerai","commenceras","commencera","commencerons","commencerez","commenceront"],"conditionnel":["commencerais","commencerais","commencerait","commencerions","commenceriez","commenceraient"],"subjonctif":["commence","commences","commence","commencions","commenciez","commencent"]},{"inf":"payer","es":"pagar","def":"Donner de l'argent en échange d'un bien ou d'un service.","aux":"avoir","present":["paie","paies","paie","payons","payez","paient"],"imparfait":["payais","payais","payait","payions","payiez","payaient"],"passe_compose":["ai payé","as payé","a payé","avons payé","avez payé","ont payé"],"futur":["paierai","paieras","paiera","paierons","paierez","paieront"],"conditionnel":["paierais","paierais","paierait","paierions","paieriez","paieraient"],"subjonctif":["paie","paies","paie","payions","payiez","paient"]},{"inf":"acheter","es":"comprar","def":"Obtenir un bien en échange d'argent.","aux":"avoir","present":["achète","achètes","achète","achetons","achetez","achètent"],"imparfait":["achetais","achetais","achetait","achetions","achetiez","achetaient"],"passe_compose":["ai acheté","as acheté","a acheté","avons acheté","avez acheté","ont acheté"],"futur":["achèterai","achèteras","achètera","achèterons","achèterez","achèteront"],"conditionnel":["achèterais","achèterais","achèterait","achèterions","achèteriez","achèteraient"],"subjonctif":["achète","achètes","achète","achetions","achetiez","achètent"]},{"inf":"appeler","es":"llamar","def":"Nommer quelqu'un ou attirer son attention par la voix.","aux":"avoir","present":["appelle","appelles","appelle","appelons","appelez","appellent"],"imparfait":["appelais","appelais","appelait","appelions","appeliez","appelaient"],"passe_compose":["ai appelé","as appelé","a appelé","avons appelé","avez appelé","ont appelé"],"futur":["appellerai","appelleras","appellera","appellerons","appellerez","appelleront"],"conditionnel":["appellerais","appellerais","appellerait","appellerions","appelleriez","appelleraient"],"subjonctif":["appelle","appelles","appelle","appelions","appeliez","appellent"]},{"inf":"se lever","es":"levantarse","def":"Se mettre debout ou sortir du lit.","aux":"être","present":["me lève","te lèves","se lève","nous levons","vous levez","se lèvent"],"imparfait":["me levais","te levais","se levait","nous levions","vous leviez","se levaient"],"passe_compose":["me suis levé(e)","t'es levé(e)","s'est levé(e)","nous sommes levé(e)s","vous êtes levé(e)s","se sont levé(e)s"],"futur":["me lèverai","te lèveras","se lèvera","nous lèverons","vous lèverez","se lèveront"],"conditionnel":["me lèverais","te lèverais","se lèverait","nous lèverions","vous lèveriez","se lèveraient"],"subjonctif":["me lève","te lèves","se lève","nous levions","vous leviez","se lèvent"]},{"inf":"connaître","es":"conocer","def":"Avoir une idée ou une expérience de quelqu'un ou quelque chose.","aux":"avoir","present":["connais","connais","connaît","connaissons","connaissez","connaissent"],"imparfait":["connaissais","connaissais","connaissait","connaissions","connaissiez","connaissaient"],"passe_compose":["ai connu","as connu","a connu","avons connu","avez connu","ont connu"],"futur":["connaîtrai","connaîtras","connaîtra","connaîtrons","connaîtrez","connaîtront"],"conditionnel":["connaîtrais","connaîtrais","connaîtrait","connaîtrions","connaîtriez","connaîtraient"],"subjonctif":["connaisse","connaisses","connaisse","connaissions","connaissiez","connaissent"]},{"inf":"écrire","es":"escribir","def":"Tracer des mots ou composer un texte.","aux":"avoir","present":["écris","écris","écrit","écrivons","écrivez","écrivent"],"imparfait":["écrivais","écrivais","écrivait","écrivions","écriviez","écrivaient"],"passe_compose":["ai écrit","as écrit","a écrit","avons écrit","avez écrit","ont écrit"],"futur":["écrirai","écriras","écrira","écrirons","écrirez","écriront"],"conditionnel":["écrirais","écrirais","écrirait","écririons","écririez","écriraient"],"subjonctif":["écrive","écrives","écrive","écrivions","écriviez","écrivent"]},{"inf":"lire","es":"leer","def":"Comprendre un texte écrit par les yeux.","aux":"avoir","present":["lis","lis","lit","lisons","lisez","lisent"],"imparfait":["lisais","lisais","lisait","lisions","lisiez","lisaient"],"passe_compose":["ai lu","as lu","a lu","avons lu","avez lu","ont lu"],"futur":["lirai","liras","lira","lirons","lirez","liront"],"conditionnel":["lirais","lirais","lirait","lirions","liriez","liraient"],"subjonctif":["lise","lises","lise","lisions","lisiez","lisent"]},{"inf":"boire","es":"beber","def":"Avaler un liquide.","aux":"avoir","present":["bois","bois","boit","buvons","buvez","boivent"],"imparfait":["buvais","buvais","buvait","buvions","buviez","buvaient"],"passe_compose":["ai bu","as bu","a bu","avons bu","avez bu","ont bu"],"futur":["boirai","boiras","boira","boirons","boirez","boiront"],"conditionnel":["boirais","boirais","boirait","boirions","boiriez","boiraient"],"subjonctif":["boive","boives","boive","buvions","buviez","boivent"]},{"inf":"dormir","es":"dormir","def":"Être dans l'état de sommeil.","aux":"avoir","present":["dors","dors","dort","dormons","dormez","dorment"],"imparfait":["dormais","dormais","dormait","dormions","dormiez","dormaient"],"passe_compose":["ai dormi","as dormi","a dormi","avons dormi","avez dormi","ont dormi"],"futur":["dormirai","dormiras","dormira","dormirons","dormirez","dormiront"],"conditionnel":["dormirais","dormirais","dormirait","dormirions","dormiriez","dormiraient"],"subjonctif":["dorme","dormes","dorme","dormions","dormiez","dorment"]},{"inf":"attendre","es":"esperar","def":"Rester jusqu'à ce que quelque chose ou quelqu'un arrive.","aux":"avoir","present":["attends","attends","attend","attendons","attendez","attendent"],"imparfait":["attendais","attendais","attendait","attendions","attendiez","attendaient"],"passe_compose":["ai attendu","as attendu","a attendu","avons attendu","avez attendu","ont attendu"],"futur":["attendrai","attendras","attendra","attendrons","attendrez","attendront"],"conditionnel":["attendrais","attendrais","attendrait","attendrions","attendriez","attendraient"],"subjonctif":["attende","attendes","attende","attendions","attendiez","attendent"]},{"inf":"répondre","es":"responder","def":"Donner une réponse à une question ou un message.","aux":"avoir","present":["réponds","réponds","répond","répondons","répondez","répondent"],"imparfait":["répondais","répondais","répondait","répondions","répondiez","répondaient"],"passe_compose":["ai répondu","as répondu","a répondu","avons répondu","avez répondu","ont répondu"],"futur":["répondrai","répondras","répondra","répondrons","répondrez","répondront"],"conditionnel":["répondrais","répondrais","répondrait","répondrions","répondriez","répondraient"],"subjonctif":["réponde","répondes","réponde","répondions","répondiez","répondent"]},{"inf":"perdre","es":"perder","def":"Cesser d'avoir ou ne pas réussir à garder quelque chose.","aux":"avoir","present":["perds","perds","perd","perdons","perdez","perdent"],"imparfait":["perdais","perdais","perdait","perdions","perdiez","perdaient"],"passe_compose":["ai perdu","as perdu","a perdu","avons perdu","avez perdu","ont perdu"],"futur":["perdrai","perdras","perdra","perdrons","perdrez","perdront"],"conditionnel":["perdrais","perdrais","perdrait","perdrions","perdriez","perdraient"],"subjonctif":["perde","perdes","perde","perdions","perdiez","perdent"]},{"inf":"croire","es":"creer","def":"Tenir quelque chose pour vrai ; avoir foi.","aux":"avoir","present":["crois","crois","croit","croyons","croyez","croient"],"imparfait":["croyais","croyais","croyait","croyions","croyiez","croyaient"],"passe_compose":["ai cru","as cru","a cru","avons cru","avez cru","ont cru"],"futur":["croirai","croiras","croira","croirons","croirez","croiront"],"conditionnel":["croirais","croirais","croirait","croirions","croiriez","croiraient"],"subjonctif":["croie","croies","croie","croyions","croyiez","croient"]},{"inf":"recevoir","es":"recibir","def":"Obtenir ou accueillir quelque chose ou quelqu'un.","aux":"avoir","present":["reçois","reçois","reçoit","recevons","recevez","reçoivent"],"imparfait":["recevais","recevais","recevait","recevions","receviez","recevaient"],"passe_compose":["ai reçu","as reçu","a reçu","avons reçu","avez reçu","ont reçu"],"futur":["recevrai","recevras","recevra","recevrons","recevrez","recevront"],"conditionnel":["recevrais","recevrais","recevrait","recevrions","recevriez","recevraient"],"subjonctif":["reçoive","reçoives","reçoive","recevions","receviez","reçoivent"]},{"inf":"devenir","es":"convertirse / volverse","def":"Commencer à être quelque chose qu'on n'était pas.","aux":"être","present":["deviens","deviens","devient","devenons","devenez","deviennent"],"imparfait":["devenais","devenais","devenait","devenions","deveniez","devenaient"],"passe_compose":["suis devenu(e)","es devenu(e)","est devenu(e)","sommes devenu(e)s","êtes devenu(e)s","sont devenu(e)s"],"futur":["deviendrai","deviendras","deviendra","deviendrons","deviendrez","deviendront"],"conditionnel":["deviendrais","deviendrais","deviendrait","deviendrions","deviendriez","deviendraient"],"subjonctif":["devienne","deviennes","devienne","devenions","deveniez","deviennent"]},{"inf":"tenir","es":"tener / sostener","def":"Garder quelque chose dans la main ou le maintenir.","aux":"avoir","present":["tiens","tiens","tient","tenons","tenez","tiennent"],"imparfait":["tenais","tenais","tenait","tenions","teniez","tenaient"],"passe_compose":["ai tenu","as tenu","a tenu","avons tenu","avez tenu","ont tenu"],"futur":["tiendrai","tiendras","tiendra","tiendrons","tiendrez","tiendront"],"conditionnel":["tiendrais","tiendrais","tiendrait","tiendrions","tiendriez","tiendraient"],"subjonctif":["tienne","tiennes","tienne","tenions","teniez","tiennent"]},{"inf":"ouvrir","es":"abrir","def":"Faire en sorte qu'une chose ne soit plus fermée.","aux":"avoir","present":["ouvre","ouvres","ouvre","ouvrons","ouvrez","ouvrent"],"imparfait":["ouvrais","ouvrais","ouvrait","ouvrions","ouvriez","ouvraient"],"passe_compose":["ai ouvert","as ouvert","a ouvert","avons ouvert","avez ouvert","ont ouvert"],"futur":["ouvrirai","ouvriras","ouvrira","ouvrirons","ouvrirez","ouvriront"],"conditionnel":["ouvrirais","ouvrirais","ouvrirait","ouvririons","ouvririez","ouvriraient"],"subjonctif":["ouvre","ouvres","ouvre","ouvrions","ouvriez","ouvrent"]},{"inf":"offrir","es":"ofrecer / regalar","def":"Donner quelque chose en cadeau ou proposer.","aux":"avoir","present":["offre","offres","offre","offrons","offrez","offrent"],"imparfait":["offrais","offrais","offrait","offrions","offriez","offraient"],"passe_compose":["ai offert","as offert","a offert","avons offert","avez offert","ont offert"],"futur":["offrirai","offriras","offrira","offrirons","offrirez","offriront"],"conditionnel":["offrirais","offrirais","offrirait","offririons","offririez","offriraient"],"subjonctif":["offre","offres","offre","offrions","offriez","offrent"]},{"inf":"sentir","es":"sentir / oler","def":"Percevoir par les sens ou éprouver une sensation.","aux":"avoir","present":["sens","sens","sent","sentons","sentez","sentent"],"imparfait":["sentais","sentais","sentait","sentions","sentiez","sentaient"],"passe_compose":["ai senti","as senti","a senti","avons senti","avez senti","ont senti"],"futur":["sentirai","sentiras","sentira","sentirons","sentirez","sentiront"],"conditionnel":["sentirais","sentirais","sentirait","sentirions","sentiriez","sentiraient"],"subjonctif":["sente","sentes","sente","sentions","sentiez","sentent"]},{"inf":"suivre","es":"seguir","def":"Aller derrière quelqu'un ou continuer dans une direction.","aux":"avoir","present":["suis","suis","suit","suivons","suivez","suivent"],"imparfait":["suivais","suivais","suivait","suivions","suiviez","suivaient"],"passe_compose":["ai suivi","as suivi","a suivi","avons suivi","avez suivi","ont suivi"],"futur":["suivrai","suivras","suivra","suivrons","suivrez","suivront"],"conditionnel":["suivrais","suivrais","suivrait","suivrions","suivriez","suivraient"],"subjonctif":["suive","suives","suive","suivions","suiviez","suivent"]},{"inf":"vivre","es":"vivir","def":"Être en vie ; mener son existence.","aux":"avoir","present":["vis","vis","vit","vivons","vivez","vivent"],"imparfait":["vivais","vivais","vivait","vivions","viviez","vivaient"],"passe_compose":["ai vécu","as vécu","a vécu","avons vécu","avez vécu","ont vécu"],"futur":["vivrai","vivras","vivra","vivrons","vivrez","vivront"],"conditionnel":["vivrais","vivrais","vivrait","vivrions","vivriez","vivraient"],"subjonctif":["vive","vives","vive","vivions","viviez","vivent"]},{"inf":"envoyer","es":"enviar","def":"Faire parvenir quelque chose à quelqu'un.","aux":"avoir","present":["envoie","envoies","envoie","envoyons","envoyez","envoient"],"imparfait":["envoyais","envoyais","envoyait","envoyions","envoyiez","envoyaient"],"passe_compose":["ai envoyé","as envoyé","a envoyé","avons envoyé","avez envoyé","ont envoyé"],"futur":["enverrai","enverras","enverra","enverrons","enverrez","enverront"],"conditionnel":["enverrais","enverrais","enverrait","enverrions","enverriez","enverraient"],"subjonctif":["envoie","envoies","envoie","envoyions","envoyiez","envoient"]},{"inf":"étudier","es":"estudiar","def":"Apprendre quelque chose en y consacrant son attention.","aux":"avoir","present":["étudie","étudies","étudie","étudions","étudiez","étudient"],"imparfait":["étudiais","étudiais","étudiait","étudiions","étudiiez","étudiaient"],"passe_compose":["ai étudié","as étudié","a étudié","avons étudié","avez étudié","ont étudié"],"futur":["étudierai","étudieras","étudiera","étudierons","étudierez","étudieront"],"conditionnel":["étudierais","étudierais","étudierait","étudierions","étudieriez","étudieraient"],"subjonctif":["étudie","étudies","étudie","étudiions","étudiiez","étudient"]},{"inf":"travailler","es":"trabajar","def":"Exercer une activité ou un métier pour produire quelque chose.","aux":"avoir","present":["travaille","travailles","travaille","travaillons","travaillez","travaillent"],"imparfait":["travaillais","travaillais","travaillait","travaillions","travailliez","travaillaient"],"passe_compose":["ai travaillé","as travaillé","a travaillé","avons travaillé","avez travaillé","ont travaillé"],"futur":["travaillerai","travailleras","travaillera","travaillerons","travaillerez","travailleront"],"conditionnel":["travaillerais","travaillerais","travaillerait","travaillerions","travailleriez","travailleraient"],"subjonctif":["travaille","travailles","travaille","travaillions","travailliez","travaillent"]},{"inf":"réussir","es":"lograr / aprobar","def":"Atteindre le but qu'on s'était fixé.","aux":"avoir","present":["réussis","réussis","réussit","réussissons","réussissez","réussissent"],"imparfait":["réussissais","réussissais","réussissait","réussissions","réussissiez","réussissaient"],"passe_compose":["ai réussi","as réussi","a réussi","avons réussi","avez réussi","ont réussi"],"futur":["réussirai","réussiras","réussira","réussirons","réussirez","réussiront"],"conditionnel":["réussirais","réussirais","réussirait","réussirions","réussiriez","réussiraient"],"subjonctif":["réussisse","réussisses","réussisse","réussissions","réussissiez","réussissent"]},{"inf":"choisir","es":"elegir","def":"Prendre une chose plutôt qu'une autre.","aux":"avoir","present":["choisis","choisis","choisit","choisissons","choisissez","choisissent"],"imparfait":["choisissais","choisissais","choisissait","choisissions","choisissiez","choisissaient"],"passe_compose":["ai choisi","as choisi","a choisi","avons choisi","avez choisi","ont choisi"],"futur":["choisirai","choisiras","choisira","choisirons","choisirez","choisiront"],"conditionnel":["choisirais","choisirais","choisirait","choisirions","choisiriez","choisiraient"],"subjonctif":["choisisse","choisisses","choisisse","choisissions","choisissiez","choisissent"]}];
+const PRON_DISPLAY = ["je / j'", "tu", "il / elle", "nous", "vous", "ils / elles"];
+const TENSES = [
+  {key:"present", label:"présent"},
+  {key:"imparfait", label:"imparfait"},
+  {key:"passe_compose", label:"passé composé"},
+  {key:"futur", label:"futur simple"},
+  {key:"conditionnel", label:"conditionnel présent"},
+  {key:"subjonctif", label:"subjonctif présent"}
+];
+
+let conjMode = "quiz";   // "quiz" | "table"
+let fixedVerb = null;    // verbe choisi dans la liste (null = aléatoire)
+
+function showConj(which){
+  conjMode = which;   // "quiz" | "fill" | "table"
+  document.getElementById("conjQuiz").classList.toggle("hidden", which!=="quiz");
+  document.getElementById("conjFill").classList.toggle("hidden", which!=="fill");
+  document.getElementById("conjTable").classList.toggle("hidden", which!=="table");
+  document.getElementById("csubQuiz").classList.toggle("active", which==="quiz");
+  document.getElementById("csubFill").classList.toggle("active", which==="fill");
+  document.getElementById("csubTable").classList.toggle("active", which==="table");
+  if(which==="quiz" && !qCur) qNext();
+  if(which==="fill" && fixedVerb) renderFill(fixedVerb);
+  if(which==="table" && fixedVerb) renderVerbTable(fixedVerb);
+}
+
+/* ---- Liste des verbes (gauche) ---- */
+function renderVList(filter){
+  const ul = document.getElementById("vlistUl");
+  const f = normv(filter || "");
+  const list = VERBS.filter(v => !f || normv(v.inf).includes(f))
+                    .slice().sort((a,b)=>a.inf.localeCompare(b.inf,"fr"));
+  document.getElementById("vlistTitle").textContent = "Verbes (" + list.length + ")";
+  ul.innerHTML = "";
+  list.forEach(v => {
+    const li = document.createElement("li");
+    li.textContent = v.inf;
+    if(fixedVerb && v.inf === fixedVerb.inf) li.className = "sel";
+    li.onclick = () => pickVerb(v);
+    ul.appendChild(li);
+  });
+}
+function pickVerb(v){
+  fixedVerb = v;
+  document.querySelectorAll("#vlistUl li").forEach(li => {
+    li.classList.toggle("sel", li.textContent === v.inf);
+  });
+  if(conjMode === "table"){
+    renderVerbTable(v);
+  } else if(conjMode === "fill"){
+    renderFill(v);
+  } else {
+    qNext();   // nouvelle question sur ce verbe (temps/pronom aléatoires)
+  }
+}
+
+// para el subjonctif mostramos "que je", etc.
+function pronLabel(i, tenseKey){
+  const base = PRON_DISPLAY[i];
+  return tenseKey === "subjonctif" ? "que " + base : base;
+}
+
+/* ---- Quiz ---- */
+let qCur = null, qCorrect = 0, qTotal = 0, qAnswered = false;
+
+function qPick(){
+  // si un verbe est sélectionné dans la liste, on le garde ; sinon aléatoire
+  const verb = fixedVerb || VERBS[Math.floor(Math.random()*VERBS.length)];
+  const tense = TENSES[Math.floor(Math.random()*TENSES.length)];
+  const pi = Math.floor(Math.random()*6);
+  return { verb, tense, pi, answer: verb[tense.key][pi] };
+}
+function qRender(){
+  const c = qCur;
+  qAnswered = false;
+  document.getElementById("qverb").textContent = c.verb.inf;
+  document.getElementById("qdef").textContent = c.verb.def;
+  document.getElementById("qtense").textContent = c.tense.label;
+  document.getElementById("qpron").textContent = pronLabel(c.pi, c.tense.key) + " …";
+  document.getElementById("qinp").value = "";
+  document.getElementById("qfb").textContent = "";
+  document.getElementById("qansText").textContent = "";
+  document.getElementById("qans").classList.remove("ok2");
+  document.getElementById("qspeak").classList.add("hidden");
+  document.getElementById("qinp").focus();
+}
+function qNext(){ qCur = qPick(); qRender(); }
+
+// normaliza la respuesta: quita marcas de acuerdo (e)/(e)s y espacios extra
+function flex(s){
+  return String(s).trim().toLowerCase()
+    .replace(/\(e\)s?/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\u2019/g, "'")
+    .trim();
+}
+function flexNoAcc(s){ return flex(s).normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+
+function qCheck(){
+  if(qAnswered){ qNext(); return; }
+  const val = document.getElementById("qinp").value;
+  if(!flex(val)) return;
+  qTotal++; qAnswered = true;
+  const fb = document.getElementById("qfb");
+  const ansEl = document.getElementById("qans");
+  const good = flexNoAcc(val) === flexNoAcc(qCur.answer);
+  if(good){
+    qCorrect++;
+    fb.textContent = "✅ Correct !"; fb.className = "feedback ok";
+    ansEl.classList.add("ok2");
+    let txt = qCur.answer;
+    if(flex(val) !== flex(qCur.answer)) txt += "  (orthographe exacte)";
+    document.getElementById("qansText").textContent = txt;
+  } else {
+    fb.textContent = "❌ Pas tout à fait."; fb.className = "feedback no";
+    ansEl.classList.remove("ok2");
+    document.getElementById("qansText").textContent = "→ " + qCur.answer;
+  }
+  document.getElementById("qspeak").classList.remove("hidden");
+  document.getElementById("qscore").textContent = "Score : " + qCorrect + " / " + qTotal;
+}
+function qReveal(){
+  if(qAnswered) return;
+  document.getElementById("qansText").textContent = "→ " + qCur.answer;
+  document.getElementById("qans").classList.remove("ok2");
+  document.getElementById("qspeak").classList.remove("hidden");
+}
+document.getElementById("qinp").addEventListener("keydown", e => { if(e.key === "Enter") qCheck(); });
+
+/* ---- Tableau (recherche) ---- */
+function escc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function renderVerbTable(v){
+  let h = '<div class="vhead"><div class="vtitle">' + escc(v.inf)
+    + ' <button class="speak" onclick="speakWord(currentTableInf)" title="Écouter">🔊</button></div>'
+    + '<button class="showes" id="vesBtn" onclick="toggleVes()">🇪🇸 Voir la traduction</button></div>';
+  h += '<div class="qdef" style="text-align:left; margin:2px 0;">' + escc(v.def) + '</div>';
+  h += '<div class="es2 hidden" id="ves" style="text-align:left;">🇪🇸 ' + escc(v.es)
+    + ' · auxiliaire : <b>' + escc(v.aux) + '</b></div>';
+  // grille : colonne gauche = présent/imparfait/passé composé ; colonne droite = futur/conditionnel/subjonctif
+  h += '<div class="tgrid">';
+  TENSES.forEach(t => {
+    h += '<table class="vtable"><tr><th colspan="2">' + escc(t.label) + '</th></tr>';
+    v[t.key].forEach((form, i) => {
+      h += '<tr><td class="pron">' + escc(pronLabel(i, t.key)) + '</td><td>' + escc(form) + '</td></tr>';
+    });
+    h += '</table>';
+  });
+  h += '</div>';
+  document.getElementById("vresult").innerHTML = h;
+  currentTableInf = v.inf;
+}
+let currentTableInf = "";
+function toggleVes(){
+  const es = document.getElementById("ves");
+  const hidden = es.classList.toggle("hidden");
+  document.getElementById("vesBtn").textContent = hidden ? "🇪🇸 Voir la traduction" : "🇪🇸 Masquer la traduction";
+}
+/* ---- Mode Remplir le tableau ---- */
+let fillVerb = null;
+function renderFill(v){
+  fillVerb = v;
+  let h = '<div class="ftitle"><div class="vtitle">' + escc(v.inf)
+    + ' <button class="speak" onclick="speakWord(fillVerb && fillVerb.inf)" title="Écouter">🔊</button></div>'
+    + '<span style="font-size:13px;color:#999;">Remplis toutes les cases</span></div>';
+  h += '<div class="qdef" style="text-align:left; margin:2px 0 4px;">' + escc(v.def) + '</div>';
+  h += '<div class="tgrid">';
+  TENSES.forEach((t, ti) => {
+    h += '<table class="vtable ftable"><tr><th colspan="2">' + escc(t.label) + '</th></tr>';
+    v[t.key].forEach((form, i) => {
+      const id = 'f_' + ti + '_' + i;
+      h += '<tr><td class="pron">' + escc(pronLabel(i, t.key)) + '</td>'
+         + '<td><input id="' + id + '" data-ans="' + escc(form) + '" autocomplete="off" autocapitalize="off" spellcheck="false"></td></tr>';
+    });
+    h += '</table>';
+  });
+  h += '</div>';
+  h += '<div class="fbtns"><button class="verif" onclick="fillCheck()">Vérifier</button>'
+     + '<button class="sec" onclick="fillReveal()">Voir les réponses</button></div>';
+  h += '<div class="fscore" id="fscore"></div>';
+  document.getElementById("fillArea").innerHTML = h;
+}
+function fillCheck(){
+  const inputs = document.querySelectorAll("#fillArea input");
+  let ok = 0, filled = 0;
+  inputs.forEach(inp => {
+    const ans = inp.getAttribute("data-ans");
+    const val = inp.value;
+    inp.classList.remove("ok", "ko");
+    if(!flex(val)){ return; }   // vide : on ne marque pas
+    filled++;
+    if(flexNoAcc(val) === flexNoAcc(ans)){ inp.classList.add("ok"); ok++; }
+    else { inp.classList.add("ko"); }
+  });
+  document.getElementById("fscore").textContent =
+    "✅ " + ok + " / " + inputs.length + " correctes" + (filled<inputs.length ? "  ("+(inputs.length-filled)+" vides)" : "");
+}
+function fillReveal(){
+  document.querySelectorAll("#fillArea input").forEach(inp => {
+    inp.value = inp.getAttribute("data-ans");
+    inp.classList.remove("ko"); inp.classList.add("ok");
+  });
+  const inputs = document.querySelectorAll("#fillArea input");
+  document.getElementById("fscore").textContent = "Réponses affichées (" + inputs.length + " formes).";
+}
+
+function normv(s){ return String(s).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+// le champ de recherche filtre la liste de gauche (par infinitif français uniquement)
+document.getElementById("vsearch").addEventListener("input", function(){
+  renderVList(this.value);
+});
+
 </script>
 </body>
 </html>
