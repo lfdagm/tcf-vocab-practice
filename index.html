@@ -83,6 +83,13 @@
   .ftable input.ok { border-color:#1a8a3a; background:#eefaf0; color:#1a8a3a; font-weight:bold; }
   .ftable input.ko { border-color:#d33; background:#fdeeee; }
   .ftable td.sol { color:#1a8a3a; font-weight:bold; font-size:14px; }
+  .ftable .frow { display:flex; gap:4px; align-items:center; }
+  .ftable .frow input { flex:1; min-width:0; width:auto; }
+  .ftable .ftell { background:none; border:none; cursor:pointer; padding:2px 5px; color:#888; font-size:14px; flex:0 0 auto; min-width:0; line-height:1; }
+  .ftable .ftell:hover { color:#1a73e8; }
+  .ftable .fsol { color:#1a8a3a; font-weight:bold; font-size:13px; margin-top:3px; }
+  .ftable .fsol.hidden { display:none !important; }
+  .fhint { text-align:center; font-size:12px; color:#aaa; margin-top:8px; }
   .ftitle { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
   .ftitle .vtitle { font-size:21px; }
   .fbtns { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
@@ -730,15 +737,40 @@ function renderFill(v){
     v[t.key].forEach((form, i) => {
       const id = 'f_' + ti + '_' + i;
       h += '<tr><td class="pron">' + escc(pronLabel(i, t.key)) + '</td>'
-         + '<td><input id="' + id + '" data-ans="' + escc(form) + '" autocomplete="off" autocapitalize="off" spellcheck="false"></td></tr>';
+         + '<td>'
+         +   '<div class="frow">'
+         +     '<input id="' + id + '" data-ans="' + escc(form) + '" autocomplete="off" autocapitalize="off" spellcheck="false">'
+         +     '<button type="button" class="ftell" title="Voir la réponse">👁</button>'
+         +   '</div>'
+         +   '<div class="fsol hidden">' + escc(form) + '</div>'
+         + '</td></tr>';
     });
     h += '</table>';
   });
   h += '</div>';
-  h += '<div class="fbtns"><button class="verif" onclick="fillCheck()">Vérifier</button>'
-     + '<button class="sec" onclick="fillReveal()">Voir les réponses</button></div>';
+  h += '<div class="fbtns"><button class="verif" onclick="fillCheck()">Vérifier tout</button></div>';
+  h += '<div class="fhint">⌨️ <b>Entrée</b> dans une case : vérifier · 👁 : révéler cette réponse</div>';
   h += '<div class="fscore" id="fscore"></div>';
   document.getElementById("fillArea").innerHTML = h;
+  document.querySelectorAll("#fillArea input").forEach(inp => {
+    inp.addEventListener("keydown", function(e){
+      if(e.key === "Enter"){ e.preventDefault(); fillCheckOne(inp); }
+    });
+  });
+  document.querySelectorAll("#fillArea .ftell").forEach(btn => {
+    btn.addEventListener("click", function(){
+      btn.closest("td").querySelector(".fsol").classList.remove("hidden");
+    });
+  });
+}
+function fillCheckOne(inp){
+  const ans = inp.getAttribute("data-ans");
+  const val = inp.value;
+  const sol = inp.closest("td").querySelector(".fsol");
+  inp.classList.remove("ok", "ko");
+  if(!flex(val)){ sol.classList.remove("hidden"); return; }
+  if(flexNoAcc(val) === flexNoAcc(ans)){ inp.classList.add("ok"); sol.classList.add("hidden"); }
+  else { inp.classList.add("ko"); sol.classList.remove("hidden"); }
 }
 function fillCheck(){
   const inputs = document.querySelectorAll("#fillArea input");
@@ -746,11 +778,12 @@ function fillCheck(){
   inputs.forEach(inp => {
     const ans = inp.getAttribute("data-ans");
     const val = inp.value;
+    const sol = inp.closest("td").querySelector(".fsol");
     inp.classList.remove("ok", "ko");
     if(!flex(val)){ return; }   // vide : on ne marque pas
     filled++;
-    if(flexNoAcc(val) === flexNoAcc(ans)){ inp.classList.add("ok"); ok++; }
-    else { inp.classList.add("ko"); }
+    if(flexNoAcc(val) === flexNoAcc(ans)){ inp.classList.add("ok"); if(sol) sol.classList.add("hidden"); ok++; }
+    else { inp.classList.add("ko"); if(sol) sol.classList.remove("hidden"); }
   });
   document.getElementById("fscore").textContent =
     "✅ " + ok + " / " + inputs.length + " correctes" + (filled<inputs.length ? "  ("+(inputs.length-filled)+" vides)" : "");
