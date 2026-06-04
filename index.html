@@ -276,6 +276,17 @@
   .vtable td { border-top:1px solid var(--border); padding:9px 12px; }
   .vtable tr:first-child td { border-top:none; }
   .vtable td.pron { color:var(--text-soft); width:80px; font-weight:500; }
+  .vform { vertical-align:middle; }
+  .vspeak {
+    background:transparent; border:1px solid transparent;
+    cursor:pointer; padding:2px 6px;
+    color:var(--text-soft); font-size:13px; line-height:1;
+    border-radius:6px; vertical-align:middle;
+    margin-left:4px; min-width:0; flex:0 0 auto;
+    transition: background-color var(--t), color var(--t);
+  }
+  .vspeak:hover { background:var(--primary-soft); color:var(--primary); }
+  .vspeak:focus-visible { outline:none; box-shadow: var(--ring); }
 
   .tgrid { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:repeat(3,auto); grid-auto-flow:column; gap:16px 18px; margin-top:14px; align-items:start; }
   .tgrid .vtable { margin-top:0; }
@@ -466,7 +477,7 @@
         </div>
         <div class="feedback" id="qfb"></div>
         <div class="answer" id="qans"><span id="qansText"></span>
-          <button class="speak hidden" id="qspeak" onclick="speakWord(qCur && qCur.answer)" title="Écouter">🔊</button>
+          <button class="speak hidden" id="qspeak" onclick="qSpeak()" title="Écouter (avec pronom)" aria-label="Écouter la réponse avec le pronom">🔊</button>
         </div>
       </div>
       <div class="score" id="qscore">Score : 0 / 0</div>
@@ -763,6 +774,29 @@ function speak(){
   const c = pool[fOrder[fIndex]];
   if(c) speakWord(c.f);
 }
+// construye la frase completa con pronombre personal + forma conjugada,
+// aplicando elisión (j', qu') y respetando formas reflexivas y subjonctif.
+function buildConjPhrase(pi, form, tenseKey){
+  if(form == null) return "";
+  let f = String(form).replace(/\(e\)s?/g, "").replace(/\s+/g, " ").trim();
+  const reflexive = /^(me\s|m'|te\s|t'|se\s|s'|nous\s|vous\s)/i.test(f);
+  let phrase;
+  if(pi === 0){
+    if(reflexive) phrase = "je " + f;
+    else if(/^[aeiouyhéèêàâîïôœùû]/i.test(f)) phrase = "j'" + f;
+    else phrase = "je " + f;
+  } else if(pi === 1) phrase = "tu " + f;
+  else if(pi === 2) phrase = "il " + f;
+  else if(pi === 3) phrase = "nous " + f;
+  else if(pi === 4) phrase = "vous " + f;
+  else phrase = "ils " + f;
+  if(tenseKey === "subjonctif"){
+    phrase = (pi === 2 || pi === 5) ? "qu'" + phrase : "que " + phrase;
+  }
+  return phrase;
+}
+function speakConj(pi, form, tenseKey){ speakWord(buildConjPhrase(pi, form, tenseKey)); }
+function qSpeak(){ if(qCur) speakConj(qCur.pi, qCur.answer, qCur.tense.key); }
 
 /* ===== Accesibilité clavier (mode Flashcards) ===== */
 // Espace = suivant · Delete/Backspace = précédent · P ou ↑ = écouter · →/← aussi
@@ -935,13 +969,21 @@ function renderVerbTable(v){
   TENSES.forEach(t => {
     h += '<table class="vtable"><tr><th colspan="2">' + escc(t.label) + '</th></tr>';
     v[t.key].forEach((form, i) => {
-      h += '<tr><td class="pron">' + escc(pronLabel(i, t.key)) + '</td><td>' + escc(form) + '</td></tr>';
+      h += '<tr><td class="pron">' + escc(pronLabel(i, t.key)) + '</td>'
+         + '<td><span class="vform">' + escc(form) + '</span>'
+         +   ' <button type="button" class="vspeak"'
+         +     ' data-pi="' + i + '" data-form="' + escc(form) + '" data-tk="' + escc(t.key) + '"'
+         +     ' title="Écouter avec le pronom" aria-label="Écouter ' + escc(pronLabel(i, t.key)) + ' ' + escc(form) + '">🔊</button>'
+         +   '</td></tr>';
     });
     h += '</table>';
   });
   h += '</div>';
   document.getElementById("vresult").innerHTML = h;
   currentTableInf = v.inf;
+  document.querySelectorAll("#vresult .vspeak").forEach(btn => {
+    btn.addEventListener("click", () => speakConj(+btn.dataset.pi, btn.dataset.form, btn.dataset.tk));
+  });
 }
 let currentTableInf = "";
 function toggleVes(){
@@ -966,7 +1008,8 @@ function renderFill(v){
          + '<td>'
          +   '<div class="frow">'
          +     '<input id="' + id + '" data-ans="' + escc(form) + '" autocomplete="off" autocapitalize="off" spellcheck="false">'
-         +     '<button type="button" class="ftell" title="Voir la réponse">👁</button>'
+         +     '<button type="button" class="ftell fspeak" title="Écouter avec le pronom" aria-label="Écouter ' + escc(pronLabel(i, t.key)) + ' ' + escc(form) + '">🔊</button>'
+         +     '<button type="button" class="ftell" title="Voir la réponse" aria-label="Révéler la réponse">👁</button>'
          +   '</div>'
          +   '<div class="fsol hidden">' + escc(form) + '</div>'
          + '</td></tr>';
@@ -975,7 +1018,7 @@ function renderFill(v){
   });
   h += '</div>';
   h += '<div class="fbtns"><button class="verif" onclick="fillCheck()">Vérifier tout</button></div>';
-  h += '<div class="fhint">⌨️ <b>Entrée</b> dans une case : vérifier · 👁 : révéler cette réponse</div>';
+  h += '<div class="fhint">⌨️ <b>Entrée</b> : vérifier · 🔊 : écouter avec le pronom · 👁 : révéler</div>';
   h += '<div class="fscore" id="fscore"></div>';
   document.getElementById("fillArea").innerHTML = h;
   document.querySelectorAll("#fillArea input").forEach(inp => {
@@ -983,9 +1026,17 @@ function renderFill(v){
       if(e.key === "Enter"){ e.preventDefault(); fillCheckOne(inp); }
     });
   });
-  document.querySelectorAll("#fillArea .ftell").forEach(btn => {
+  document.querySelectorAll("#fillArea .ftell:not(.fspeak)").forEach(btn => {
     btn.addEventListener("click", function(){
       btn.closest("td").querySelector(".fsol").classList.toggle("hidden");
+    });
+  });
+  document.querySelectorAll("#fillArea .fspeak").forEach(btn => {
+    btn.addEventListener("click", function(){
+      const inp = btn.closest(".frow").querySelector("input");
+      const ans = inp.getAttribute("data-ans");
+      const parts = inp.id.split("_"); // f_<ti>_<i>
+      speakConj(+parts[2], ans, TENSES[+parts[1]].key);
     });
   });
 }
