@@ -290,7 +290,10 @@
 
   .tgrid { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:repeat(3,auto); grid-auto-flow:column; gap:16px 18px; margin-top:14px; align-items:start; }
   .tgrid .vtable { margin-top:0; }
-  @media (max-width:560px){ .tgrid { grid-template-columns:1fr; } }
+  /* en mobile : une seule colonne, tous les temps empilés (scroll long assumé) */
+  @media (max-width:560px){
+    .tgrid { grid-template-columns:1fr; grid-template-rows:none; grid-auto-flow:row; gap:14px; }
+  }
 
   /* mode Remplir */
   .ftable input { width:100%; font-size:14px; padding:8px 10px; border:1.5px solid var(--border-strong); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); }
@@ -326,6 +329,8 @@
   .vlist li.sel { background:var(--accent); color:#fff; font-weight:600; }
   .vlist li.sel:hover { background:var(--accent); color:#fff; }
   .conjmain { flex:1; min-width:0; }
+  /* en mode Quiz aléatoire, la liste de verbes est inutile : on la masque */
+  .conjwrap.noList .vlist { display:none; }
   @media (max-width:560px){
     .conjwrap { flex-direction:column; }
     .vlist { flex:1 1 auto; width:100%; max-height:200px; }
@@ -446,7 +451,7 @@
     <button id="csubTable" onclick="showConj('table')">📖 Tableau</button>
   </div>
 
-  <div class="conjwrap">
+  <div class="conjwrap noList">
   <!-- LISTE DES VERBES (gauche) -->
   <div class="vlist">
     <input class="vsearch" id="vsearch" type="text" autocomplete="off" placeholder="🔍 Chercher..." style="font-size:14px; padding:8px; margin-bottom:8px;">
@@ -846,6 +851,8 @@ function showConj(which){
   document.getElementById("csubQuiz").classList.toggle("active", which==="quiz");
   document.getElementById("csubFill").classList.toggle("active", which==="fill");
   document.getElementById("csubTable").classList.toggle("active", which==="table");
+  // la liste de verbes ne sert qu'aux modes Remplir / Tableau
+  document.querySelector(".conjwrap").classList.toggle("noList", which==="quiz");
   if(which==="quiz" && !qCur) qNext();
   if(which==="fill" && fixedVerb) renderFill(fixedVerb);
   if(which==="table" && fixedVerb) renderVerbTable(fixedVerb);
@@ -891,8 +898,8 @@ function pronLabel(i, tenseKey){
 let qCur = null, qCorrect = 0, qTotal = 0, qAnswered = false;
 
 function qPick(){
-  // si un verbe est sélectionné dans la liste, on le garde ; sinon aléatoire
-  const verb = fixedVerb || VERBS[Math.floor(Math.random()*VERBS.length)];
+  // Quiz aléatoire : toujours un verbe au hasard, sans tenir compte de la sélection
+  const verb = VERBS[Math.floor(Math.random()*VERBS.length)];
   const tense = TENSES[Math.floor(Math.random()*TENSES.length)];
   const pi = Math.floor(Math.random()*6);
   return { verb, tense, pi, answer: verb[tense.key][pi] };
