@@ -271,7 +271,10 @@
   .qdef { font-size:14px; color:var(--text-muted); font-style:italic; text-align:center; margin-bottom:6px; }
   .conjnav { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
 
-  .vtable { width:100%; border-collapse:separate; border-spacing:0; margin-top:0; font-size:15px; border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; background:var(--surface); }
+  .vtable { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:0; margin-top:0; font-size:15px; border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; background:var(--surface); }
+  .vtable col.cpron { width:80px; }
+  .vtable td.pron { word-break:break-word; }
+  .vtable .vform { word-break:break-word; }
   .vtable th { background:var(--accent-soft); color:var(--accent); padding:10px 12px; text-align:left; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
   .vtable td { border-top:1px solid var(--border); padding:9px 12px; }
   .vtable tr:first-child td { border-top:none; }
@@ -974,7 +977,7 @@ function renderVerbTable(v){
   // grille : colonne gauche = présent/imparfait/passé composé ; colonne droite = futur/conditionnel/subjonctif
   h += '<div class="tgrid">';
   TENSES.forEach(t => {
-    h += '<table class="vtable"><tr><th colspan="2">' + escc(t.label) + '</th></tr>';
+    h += '<table class="vtable"><colgroup><col class="cpron"><col></colgroup><tr><th colspan="2">' + escc(t.label) + '</th></tr>';
     v[t.key].forEach((form, i) => {
       h += '<tr><td class="pron">' + escc(pronLabel(i, t.key)) + '</td>'
          + '<td><span class="vform">' + escc(form) + '</span>'
@@ -1008,7 +1011,7 @@ function renderFill(v){
   h += '<div class="qdef" style="text-align:left; margin:2px 0 4px;">' + escc(v.def) + '</div>';
   h += '<div class="tgrid">';
   TENSES.forEach((t, ti) => {
-    h += '<table class="vtable ftable"><tr><th colspan="2">' + escc(t.label) + '</th></tr>';
+    h += '<table class="vtable ftable"><colgroup><col class="cpron"><col></colgroup><tr><th colspan="2">' + escc(t.label) + '</th></tr>';
     v[t.key].forEach((form, i) => {
       const id = 'f_' + ti + '_' + i;
       h += '<tr><td class="pron">' + escc(pronLabel(i, t.key)) + '</td>'
